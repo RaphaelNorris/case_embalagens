@@ -29,7 +29,7 @@ Este projeto implementa um pipeline completo de ciência de dados e machine lear
 A arquitetura implementa os principais pilares de CD4ML:
 
 - **Pipelines desacoplados e versionáveis** (`src/pipelines/`)
-- **Dados rastreáveis** com versionamento por camada (`data/bronze`, `silver`, `gold`, `gold_ml`)
+- **Dados rastreáveis** com versionamento por camada (`data/raw`, `trusted`, `refined`, `ml`)
 - **Reuso de features** com armazenamento em **Feature Store**
 - **Automação de entrega** com CI/CD (`.github/workflows`, `Makefile`, `pre-commit`)
 - **Registro e rastreamento de modelos** (`ml/models`, `ml/evaluations`)
