@@ -1,0 +1,55 @@
+[project]
+name = "adami_ds"
+version = "0.1.0"
+description = "Projeto voltado para otimizao dos processos da Adami em conjunto da AMCOM"
+authors = [
+    "Raphael Norris <(Opcional) seu.email@dominio.com>",
+]
+requires-python = ">=3.12"
+readme = "README.md"
+
+dependencies = [
+
+]
+
+[project.urls]
+documentation = "https://RaphaelNorris.github.io/amcom_adami"
+repository = "https://github.com/RaphaelNorris/amcom_adami"
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.2.0",
+    "pytest>=8.3.5",
+    "pytest-cookies>=0.7.0",
+    "pytest-cov>=6.1.1",
+    "cruft[pyproject]>=2.15.0",
+]
+
+docs = [
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.5.49",
+    "mkdocstrings[python]>=0.28.1",
+    "pymdown-extensions>=10.14.3",
+]
+
+[tool.uv]
+package = false
+default-groups = [
+    "dev",
+    "docs",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.coverage.paths]
+source = ["src/"]
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["**/__init__.py"]
