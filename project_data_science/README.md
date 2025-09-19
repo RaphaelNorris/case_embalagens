@@ -29,7 +29,7 @@ Este projeto implementa um pipeline completo de ciência de dados e machine lear
 A arquitetura implementa os principais pilares de CD4ML:
 
 - **Pipelines desacoplados e versionáveis** (`src/pipelines/`)
-- **Dados rastreáveis** com versionamento por camada (`data/bronze`, `silver`, `gold`, `gold_ml`)
+- **Dados rastreáveis** com versionamento por camada (`data/raw`, `trusted`, `refined`, `refined_ml`)
 - **Reuso de features** com armazenamento em **Feature Store**
 - **Automação de entrega** com CI/CD (`.github/workflows`, `Makefile`, `pre-commit`)
 - **Registro e rastreamento de modelos** (`ml/models`, `ml/evaluations`)
@@ -130,10 +130,10 @@ Alternatively, use [pip-tools](https://github.com/jazzband/pip-tools) or [Poetry
 
 # ▒▒▒ Dados ▒▒▒
 ├── data/                               # Camadas do data lake e artefatos de ML
-│   ├── bronze/                         # Dados crus (raw) diretamente de fontes externas
-│   ├── silver/                         # Dados limpos e tratados (prontos para consumo interno)
-│   ├── gold/                           # Dados analíticos finais (features consolidadas)
-│   ├── gold_ml/                        # Gold enriquecido com predições, scores, outputs de modelo
+│   ├── raw/                         # Dados crus (raw) diretamente de fontes externas
+│   ├── trusted/                         # Dados limpos e tratados (prontos para consumo interno)
+│   ├── refined/                           # Dados analíticos finais (features consolidadas)
+│   ├── refined_ml/                        # refined enriquecido com predições, scores, outputs de modelo
 │   └── ml/                             # Artefatos do pipeline de machine learning
 │       ├── features/                   # Features derivadas, transformadas e selecionadas
 │       ├── training_sets/              # Dados finais de treino (features + target)
@@ -162,14 +162,9 @@ Alternatively, use [pip-tools](https://github.com/jazzband/pip-tools) or [Poetry
 │   ├── model/                          # Módulo de treinamento, tuning, validação, export de modelos
 │   ├── inference/                      # Módulo de inferência, serving e integração com APIs
 │   └── pipeline/                       # Pipelines de orquestração e execução
-│       ├── DE/                         # Pipelines orientados à engenharia de dados
-│       │   ├── data_pipeline/          # Pipeline de ingestão e transformação inicial
-│       │   ├── feature_pipeline/       # Pipeline de criação e versionamento de features
-│       │   └── serving_pipeline/       # Pipeline para dados em tempo real ou micro-batches
-│       └── DS/                         # Pipelines orientados à ciência de dados
-│           ├── feature_pipeline/       # Transformações e seleção de features para modelagem
-│           ├── training_pipeline/      # Pipeline completo de treino e validação de modelo
-│           └── inference_pipeline/     # Pipeline de inferência a partir de features e modelos
+│         ├── feature_pipeline/       # Transformações e seleção de features para modelagem
+│         ├── training_pipeline/      # Pipeline completo de treino e validação de modelo
+│         └── inference_pipeline/     # Pipeline de inferência a partir de features e modelos
 
 # ▒▒▒ Testes ▒▒▒
 ├── tests/                              # Código de testes automatizados
@@ -180,11 +175,7 @@ Alternatively, use [pip-tools](https://github.com/jazzband/pip-tools) or [Poetry
 
 # ▒▒▒ Documentação e ferramentas de apoio ▒▒▒
 ├── docs/                               # Documentação funcional, técnica, manuais
-├── flow/                               # Agentes internos automatizados com IA
-│   ├── flow_token.py                   # Captura de token para acesso a sistemas externos
-│   ├── generate_docs.py                # Geração automatizada de documentação com IA
-│   ├── refactor_agent.py               # Agente para refatoração com boas práticas
-│   └── review_agent.py                 # Agente de revisão técnica (docstrings, lint, segurança, etc.)
+
 
 # ▒▒▒ Configurações de ambiente e CI/CD ▒▒▒
 ├── .github/                            # Configuração para GitHub Actions
