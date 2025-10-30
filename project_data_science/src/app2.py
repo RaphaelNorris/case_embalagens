@@ -1,6 +1,4 @@
-# Streamlit Dashboard for Adami Packaging Company
-
-# app.py
+# app2.py
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -12,15 +10,15 @@ from plotly.subplots import make_subplots
 from typing import List, Dict, Set, Tuple, Optional
 import datetime
 
-# Set page configuration
+# Configuração da página
 st.set_page_config(
-    page_title="Adami Packaging Analytics",
+    page_title="Adami - Análise de Embalagens",
     page_icon="📦",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for better styling
+# CSS personalizado para melhor estilização
 st.markdown("""
 <style>
     .main-header {
@@ -67,126 +65,128 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Helper functions
+# Funções auxiliares
 @st.cache_data
-def load_data():
-    """Load and cache the data"""
+def carregar_dados():
+    """Carrega e armazena em cache os dados"""
     try:
-        df_items = pd.read_parquet('../data/02 - trusted/parquet/tb_itens.parquet')
-        df_orders = pd.read_parquet('../data/02 - trusted/parquet/tb_pedidos.parquet')
-        return df_items, df_orders
+        df_itens = pd.read_parquet('../data/02 - trusted/parquet/tb_itens.parquet')
+        df_pedidos = pd.read_parquet('../data/02 - trusted/parquet/tb_pedidos.parquet')
+        df_clientes = pd.read_parquet('../data/02 - trusted/parquet/tb_clientes.parquet')
+        df_facas = pd.read_parquet('../data/02 - trusted/parquet/tb_facas.parquet')
+        return df_itens, df_pedidos, df_clientes, df_facas
     except Exception as e:
-        st.error(f"Error loading data: {e}")
-        return None, None
+        st.error(f"Erro ao carregar dados: {e}")
+        return None, None, None, None
 
-def clean_numeric_and_categorical(df: pd.DataFrame,
-                                  numeric_threshold: float = 0.9,
+def limpar_numericos_e_categoricos(df: pd.DataFrame,
+                                  threshold_numerico: float = 0.9,
                                   inplace: bool = False) -> Tuple[pd.DataFrame, List[str], List[str]]:
-    """Clean and categorize columns as numeric or categorical"""
+    """Limpa e categoriza colunas como numéricas ou categóricas"""
     if not inplace:
         df = df.copy()
 
     df = df.replace(r'^\s*$', np.nan, regex=True)
 
-    # Start with already numeric columns
-    numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-    other_cols = [c for c in df.columns if c not in numeric_cols]
+    # Começar com colunas já numéricas
+    colunas_numericas = df.select_dtypes(include=[np.number]).columns.tolist()
+    outras_colunas = [c for c in df.columns if c not in colunas_numericas]
 
-    categorical_cols = []
+    colunas_categoricas = []
 
-    # Try coercion for non-numeric columns
-    for col in other_cols:
-        coerced = pd.to_numeric(df[col], errors='coerce')
-        prop_numeric = coerced.notna().sum() / len(df)
-        if prop_numeric >= numeric_threshold:
-            df[col] = coerced
-            numeric_cols.append(col)
+    # Tentar coerção para colunas não numéricas
+    for col in outras_colunas:
+        coercao = pd.to_numeric(df[col], errors='coerce')
+        prop_numerica = coercao.notna().sum() / len(df)
+        if prop_numerica >= threshold_numerico:
+            df[col] = coercao
+            colunas_numericas.append(col)
         else:
-            categorical_cols.append(col)
+            colunas_categoricas.append(col)
 
-    # Fill values
-    if numeric_cols:
-        df[numeric_cols] = df[numeric_cols].fillna(0)
-    if categorical_cols:
-        df[categorical_cols] = df[categorical_cols].fillna('NA')
+    # Preencher valores
+    if colunas_numericas:
+        df[colunas_numericas] = df[colunas_numericas].fillna(0)
+    if colunas_categoricas:
+        df[colunas_categoricas] = df[colunas_categoricas].fillna('NA')
 
-    return df, numeric_cols, categorical_cols
+    return df, colunas_numericas, colunas_categoricas
 
-def get_common_numeric_cols(df_orders: pd.DataFrame, df_items: pd.DataFrame) -> List[str]:
-    """Identify common columns that are numeric in both DataFrames"""
-    common = set(df_orders.columns).intersection(df_items.columns)
-    numeric_cols = []
-    for col in common:
-        s1 = pd.to_numeric(df_orders[col], errors='coerce')
-        s2 = pd.to_numeric(df_items[col], errors='coerce')
+def obter_colunas_numericas_comuns(df_pedidos: pd.DataFrame, df_itens: pd.DataFrame) -> List[str]:
+    """Identifica colunas comuns que são numéricas em ambos os DataFrames"""
+    comum = set(df_pedidos.columns).intersection(df_itens.columns)
+    colunas_numericas = []
+    for col in comum:
+        s1 = pd.to_numeric(df_pedidos[col], errors='coerce')
+        s2 = pd.to_numeric(df_itens[col], errors='coerce')
         if s1.notna().any() and s2.notna().any():
-            numeric_cols.append(col)
-    # Remove text keys that might be inadvertently converted
-    for k in ['ITEM', 'PEDIDO', 'IDCLIENTE']:
-        if k in numeric_cols:
-            numeric_cols.remove(k)
-    return sorted(numeric_cols)
+            colunas_numericas.append(col)
+    # Remover chaves de texto que podem ser convertidas inadvertidamente
+    for k in ['ID_ITEM', 'ID_PEDIDO', 'ID_IDCLIENTE']:
+        if k in colunas_numericas:
+            colunas_numericas.remove(k)
+    return sorted(colunas_numericas)
 
-def build_diff_table(df_orders: pd.DataFrame, df_items: pd.DataFrame, 
-                    id_cols: Optional[List[str]] = None, 
-                    limit_items: Optional[int] = None) -> pd.DataFrame:
-    """Build a table of differences between orders and items"""
-    if id_cols is None:
-        id_cols = [c for c in ['PEDIDO', 'ITEM', 'IDCLIENTE'] if c in df_orders.columns]
+def construir_tabela_diferencas(df_pedidos: pd.DataFrame, df_itens: pd.DataFrame, 
+                    colunas_id: Optional[List[str]] = None, 
+                    limite_itens: Optional[int] = None) -> pd.DataFrame:
+    """Constrói uma tabela de diferenças entre pedidos e itens"""
+    if colunas_id is None:
+        colunas_id = [c for c in ['ID_PEDIDO', 'ID_ITEM', 'ID_IDCLIENTE'] if c in df_pedidos.columns]
 
-    # Ensure ITEM is comparable
-    if 'ITEM' in df_orders.columns:
-        df_orders = df_orders.copy()
-        df_orders['ITEM'] = df_orders['ITEM'].astype(str)
-    if 'ITEM' in df_items.columns:
-        df_items = df_items.copy()
-        df_items['ITEM'] = df_items['ITEM'].astype(str)
+    # Garantir que ID_ITEM seja comparável
+    if 'ID_ITEM' in df_pedidos.columns:
+        df_pedidos = df_pedidos.copy()
+        df_pedidos['ID_ITEM'] = df_pedidos['ID_ITEM'].astype(str)
+    if 'ID_ITEM' in df_itens.columns:
+        df_itens = df_itens.copy()
+        df_itens['ID_ITEM'] = df_itens['ID_ITEM'].astype(str)
 
-    # Select common numeric columns
-    common_num_cols = get_common_numeric_cols(df_orders, df_items)
-    if not common_num_cols:
+    # Selecionar colunas numéricas comuns
+    colunas_num_comuns = obter_colunas_numericas_comuns(df_pedidos, df_itens)
+    if not colunas_num_comuns:
         return pd.DataFrame()
 
-    # Limit items (optional)
-    if limit_items is not None and 'ITEM' in df_orders.columns:
-        unique_items = df_orders['ITEM'].dropna().unique()
-        selected_items = set(unique_items[:limit_items])
-        df_orders = df_orders[df_orders['ITEM'].isin(selected_items)]
+    # Limitar itens (opcional)
+    if limite_itens is not None and 'ID_ITEM' in df_pedidos.columns:
+        itens_unicos = df_pedidos['ID_ITEM'].dropna().unique()
+        itens_selecionados = set(itens_unicos[:limite_itens])
+        df_pedidos = df_pedidos[df_pedidos['ID_ITEM'].isin(itens_selecionados)]
 
-    # Subsets with necessary columns
-    cols_orders = list(set(id_cols + common_num_cols))
-    cols_items = list(set(['ITEM'] + common_num_cols))
+    # Subconjuntos com colunas necessárias
+    cols_pedidos = list(set(colunas_id + colunas_num_comuns))
+    cols_itens = list(set(['ID_ITEM'] + colunas_num_comuns))
 
-    dfp = df_orders[cols_orders].copy()
-    dfi = df_items[cols_items].copy().drop_duplicates('ITEM')
+    dfp = df_pedidos[cols_pedidos].copy()
+    dfi = df_itens[cols_itens].copy().drop_duplicates('ID_ITEM')
 
-    # Coercion to numeric for common columns
-    for col in common_num_cols:
+    # Coerção para numérico para colunas comuns
+    for col in colunas_num_comuns:
         dfp[col] = pd.to_numeric(dfp[col], errors='coerce')
         dfi[col] = pd.to_numeric(dfi[col], errors='coerce')
 
-    # Merge by ITEM
-    if 'ITEM' not in dfp.columns:
+    # Mesclar por ID_ITEM
+    if 'ID_ITEM' not in dfp.columns:
         return pd.DataFrame()
-    dfm = dfp.merge(dfi, on='ITEM', how='left', suffixes=('_order', '_item'))
+    dfm = dfp.merge(dfi, on='ID_ITEM', how='left', suffixes=('_pedido', '_item'))
 
-    # Calculate differences
-    out = dfm[id_cols].copy()
-    for col in common_num_cols:
-        order_col = f"{col}_order"
-        item_col = f"{col}_item"
+    # Calcular diferenças
+    out = dfm[colunas_id].copy()
+    for col in colunas_num_comuns:
+        col_pedido = f"{col}_pedido"
+        col_item = f"{col}_item"
 
-        # If names were not suffixed, adjust:
-        if order_col not in dfm.columns and col in dfp.columns:
-            order_col = col
-        if item_col not in dfm.columns and col in dfi.columns:
-            item_col = col
+        # Se os nomes não foram sufixados, ajustar:
+        if col_pedido not in dfm.columns and col in dfp.columns:
+            col_pedido = col
+        if col_item not in dfm.columns and col in dfi.columns:
+            col_item = col
 
-        # Absolute difference
-        diff = dfm[order_col] - dfm[item_col]
+        # Diferença absoluta
+        diff = dfm[col_pedido] - dfm[col_item]
 
-        # Percentage difference with protection against division by zero
-        base = dfm[item_col].replace(0, np.nan)
+        # Diferença percentual com proteção contra divisão por zero
+        base = dfm[col_item].replace(0, np.nan)
         diff_pct = (diff / base) * 100
 
         out[f"{col}_diff"] = diff
@@ -194,1247 +194,1412 @@ def build_diff_table(df_orders: pd.DataFrame, df_items: pd.DataFrame,
 
     return out
 
-# Main app structure
+# Estrutura principal do aplicativo
 def main():
-    # Load data
-    df_items, df_orders = load_data()
+    # Carregar dados
+    df_itens, df_pedidos, df_clientes, df_facas = carregar_dados()
     
-    if df_items is None or df_orders is None:
-        st.warning("Please check data paths and try again.")
+    if df_itens is None or df_pedidos is None:
+        st.warning("Por favor, verifique os caminhos dos dados e tente novamente.")
         return
     
-    # Clean and prepare data
-    df_items_clean, items_num_cols, items_cat_cols = clean_numeric_and_categorical(df_items)
-    df_orders_clean, orders_num_cols, orders_cat_cols = clean_numeric_and_categorical(df_orders)
+    # Limpar e preparar dados
+    df_itens_limpo, itens_cols_num, itens_cols_cat = limpar_numericos_e_categoricos(df_itens)
+    df_pedidos_limpo, pedidos_cols_num, pedidos_cols_cat = limpar_numericos_e_categoricos(df_pedidos)
     
-    # Convert ID columns to string
-    id_cols = [c for c in df_orders_clean.columns if c.upper().startswith('ID') or c.upper() in ['ITEM', 'PEDIDO', 'NROPEDIDO']]
-    for col in id_cols:
-        if col in df_orders_clean.columns:
-            df_orders_clean[col] = df_orders_clean[col].astype(str)
+    # Converter colunas ID para string
+    colunas_id = [c for c in df_pedidos_limpo.columns if c.upper().startswith('ID_') or c.upper() in ['ID_ITEM', 'ID_PEDIDO']]
+    for col in colunas_id:
+        if col in df_pedidos_limpo.columns:
+            df_pedidos_limpo[col] = df_pedidos_limpo[col].astype(str)
     
-    # Convert date columns to datetime
-    date_cols = [c for c in df_orders_clean.columns if 'DATA' in c.upper()]
-    for col in date_cols:
-        if col in df_orders_clean.columns:
-            df_orders_clean[col] = pd.to_datetime(df_orders_clean[col], errors='coerce')
+    # Converter colunas de data para datetime
+    colunas_data = [c for c in df_pedidos_limpo.columns if 'DT_' in c.upper()]
+    for col in colunas_data:
+        if col in df_pedidos_limpo.columns:
+            df_pedidos_limpo[col] = pd.to_datetime(df_pedidos_limpo[col], errors='coerce')
     
-    # Header
-    st.markdown('<div class="main-header">Adami Packaging Analytics Dashboard</div>', unsafe_allow_html=True)
+    # Cabeçalho
+    st.markdown('<div class="main-header">Dashboard de Análise de Embalagens Adami</div>', unsafe_allow_html=True)
     
-    # Sidebar
-    st.sidebar.image("https://via.placeholder.com/150x80?text=Adami+Logo", use_column_width=True)
-    st.sidebar.title("Navigation")
+    # Barra lateral
+    st.sidebar.image("https://via.placeholder.com/150x80?text=Logo+Adami", use_column_width=True)
+    st.sidebar.title("Navegação")
     
-    page = st.sidebar.radio(
-        "Select Page",
-        ["Overview", "Product Analysis", "Order Analysis", "Customer Analysis", "Comparison Analysis"]
+    pagina = st.sidebar.radio(
+        "Selecione a Página",
+        ["Visão Geral", "Análise de Produtos", "Análise de Pedidos", "Análise de Clientes", "Análise Comparativa", "Análise de Facas"]
     )
     
-    # Filter section in sidebar
+    # Seção de filtros na barra lateral
     st.sidebar.markdown("---")
-    st.sidebar.subheader("Filters")
+    st.sidebar.subheader("Filtros")
     
-    # Date filter if we have date columns
-    date_filter = None
-    if date_cols:
-        main_date_col = next((col for col in date_cols if 'PEDIDO' in col.upper()), date_cols[0])
-        min_date = df_orders_clean[main_date_col].min().date()
-        max_date = df_orders_clean[main_date_col].max().date()
+    # Filtro de data se tivermos colunas de data
+    filtro_data = None
+    if colunas_data:
+        coluna_data_principal = next((col for col in colunas_data if 'PEDIDO' in col.upper()), colunas_data[0])
+        data_min = df_pedidos_limpo[coluna_data_principal].min().date()
+        data_max = df_pedidos_limpo[coluna_data_principal].max().date()
         
-        date_filter = st.sidebar.date_input(
-            f"Filter by {main_date_col}",
-            value=(min_date, max_date),
-            min_value=min_date,
-            max_value=max_date
+        filtro_data = st.sidebar.date_input(
+            f"Filtrar por {coluna_data_principal}",
+            value=(data_min, data_max),
+            min_value=data_min,
+            max_value=data_max
         )
     
-    # Customer filter
-    if 'IDCLIENTE' in df_orders_clean.columns:
-        top_customers = df_orders_clean['IDCLIENTE'].value_counts().head(20).index.tolist()
-        selected_customers = st.sidebar.multiselect(
-            "Filter by Customer",
-            options=["All"] + top_customers,
-            default="All"
+    # Filtro de cliente
+    if 'ID_IDCLIENTE' in df_pedidos_limpo.columns:
+        clientes_principais = df_pedidos_limpo['ID_IDCLIENTE'].value_counts().head(20).index.tolist()
+        clientes_selecionados = st.sidebar.multiselect(
+            "Filtrar por Cliente",
+            options=["Todos"] + clientes_principais,
+            default="Todos"
         )
     
-    # Apply filters to data
-    filtered_orders = df_orders_clean.copy()
+    # Aplicar filtros aos dados
+    pedidos_filtrados = df_pedidos_limpo.copy()
     
-    if date_filter and len(date_filter) == 2 and main_date_col in filtered_orders.columns:
-        start_date, end_date = date_filter
-        filtered_orders = filtered_orders[
-            (filtered_orders[main_date_col].dt.date >= start_date) & 
-            (filtered_orders[main_date_col].dt.date <= end_date)
+    if filtro_data and len(filtro_data) == 2 and coluna_data_principal in pedidos_filtrados.columns:
+        data_inicio, data_fim = filtro_data
+        pedidos_filtrados = pedidos_filtrados[
+            (pedidos_filtrados[coluna_data_principal].dt.date >= data_inicio) & 
+            (pedidos_filtrados[coluna_data_principal].dt.date <= data_fim)
         ]
     
-    if 'IDCLIENTE' in filtered_orders.columns and selected_customers and "All" not in selected_customers:
-        filtered_orders = filtered_orders[filtered_orders['IDCLIENTE'].isin(selected_customers)]
+    if 'ID_IDCLIENTE' in pedidos_filtrados.columns and clientes_selecionados and "Todos" not in clientes_selecionados:
+        pedidos_filtrados = pedidos_filtrados[pedidos_filtrados['ID_IDCLIENTE'].isin(clientes_selecionados)]
     
-    # Page content based on selection
-    if page == "Overview":
-        display_overview(df_items_clean, filtered_orders)
-    elif page == "Product Analysis":
-        display_product_analysis(df_items_clean)
-    elif page == "Order Analysis":
-        display_order_analysis(filtered_orders)
-    elif page == "Customer Analysis":
-        display_customer_analysis(filtered_orders)
-    else:  # Comparison Analysis
-        display_comparison_analysis(df_items_clean, filtered_orders)
+    # Conteúdo da página com base na seleção
+    if pagina == "Visão Geral":
+        exibir_visao_geral(df_itens_limpo, pedidos_filtrados)
+    elif pagina == "Análise de Produtos":
+        exibir_analise_produtos(df_itens_limpo)
+    elif pagina == "Análise de Pedidos":
+        exibir_analise_pedidos(pedidos_filtrados)
+    elif pagina == "Análise de Clientes":
+        exibir_analise_clientes(pedidos_filtrados, df_clientes)
+    elif pagina == "Análise de Facas":
+        exibir_analise_facas(df_facas)
+    else:  # Análise Comparativa
+        exibir_analise_comparativa(df_itens_limpo, pedidos_filtrados)
     
-    # Footer
+    # Rodapé
     st.markdown("---")
-    st.markdown("© 2023 Adami Packaging Analytics | Data last updated: " + 
-                datetime.datetime.now().strftime("%Y-%m-%d"))
+    st.markdown("© 2023 Adami - Análise de Embalagens | Dados atualizados em: " + 
+                datetime.datetime.now().strftime("%d/%m/%Y"))
 
-def display_overview(df_items, df_orders):
-    """Display overview dashboard with key metrics"""
-    st.markdown('<div class="sub-header">Business Overview</div>', unsafe_allow_html=True)
+def exibir_visao_geral(df_itens, df_pedidos):
+    """Exibe o dashboard de visão geral com métricas principais"""
+    st.markdown('<div class="sub-header">Visão Geral do Negócio</div>', unsafe_allow_html=True)
     
-    # Key metrics in columns
+    # Métricas principais em colunas
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
         st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-        st.markdown(f'<div class="metric-value">{len(df_items):,}</div>', unsafe_allow_html=True)
-        st.markdown('<div class="metric-label">Total Products</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric-value">{len(df_itens):,}</div>', unsafe_allow_html=True)
+        st.markdown('<div class="metric-label">Total de Produtos</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
     
     with col2:
         st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-        st.markdown(f'<div class="metric-value">{len(df_orders):,}</div>', unsafe_allow_html=True)
-        st.markdown('<div class="metric-label">Total Orders</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric-value">{len(df_pedidos):,}</div>', unsafe_allow_html=True)
+        st.markdown('<div class="metric-label">Total de Pedidos</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
     
     with col3:
-        if 'IDCLIENTE' in df_orders.columns:
+        if 'ID_IDCLIENTE' in df_pedidos.columns:
             st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-            st.markdown(f'<div class="metric-value">{df_orders["IDCLIENTE"].nunique():,}</div>', unsafe_allow_html=True)
-            st.markdown('<div class="metric-label">Unique Customers</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-value">{df_pedidos["ID_IDCLIENTE"].nunique():,}</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-label">Clientes Únicos</div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
         else:
             st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-            st.markdown('<div class="metric-value">N/A</div>', unsafe_allow_html=True)
-            st.markdown('<div class="metric-label">Unique Customers</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-value">N/D</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-label">Clientes Únicos</div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
     
     with col4:
-        if 'QUANTIDADEPEDIDA' in df_orders.columns:
-            total_qty = df_orders['QUANTIDADEPEDIDA'].sum()
+        if 'QT_QUANTIDADEPEDIDA' in df_pedidos.columns:
+            total_qtd = df_pedidos['QT_QUANTIDADEPEDIDA'].sum()
             st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-            st.markdown(f'<div class="metric-value">{total_qty:,.0f}</div>', unsafe_allow_html=True)
-            st.markdown('<div class="metric-label">Total Quantity Ordered</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-value">{total_qtd:,.0f}</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-label">Quantidade Total Pedida</div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
         else:
             st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-            st.markdown('<div class="metric-value">N/A</div>', unsafe_allow_html=True)
-            st.markdown('<div class="metric-label">Total Quantity</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-value">N/D</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-label">Quantidade Total</div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
     
-    # Time series chart if we have date columns
-    date_cols = [c for c in df_orders.columns if 'DATA' in c.upper()]
-    if date_cols:
-        st.markdown('<div class="section-header">Order Trends</div>', unsafe_allow_html=True)
+    # Gráfico de série temporal se tivermos colunas de data
+    colunas_data = [c for c in df_pedidos.columns if 'DT_' in c.upper()]
+    if colunas_data:
+        st.markdown('<div class="section-header">Tendências de Pedidos</div>', unsafe_allow_html=True)
         
-        main_date_col = next((col for col in date_cols if 'PEDIDO' in col.upper()), date_cols[0])
+        coluna_data_principal = next((col for col in colunas_data if 'PEDIDO' in col.upper()), colunas_data[0])
         
-        # Create time series
-        df_orders['year_month'] = df_orders[main_date_col].dt.to_period('M')
-        orders_by_month = df_orders.groupby('year_month').size().reset_index(name='count')
-        orders_by_month['year_month_str'] = orders_by_month['year_month'].astype(str)
+        # Criar série temporal
+        df_pedidos['ano_mes'] = df_pedidos[coluna_data_principal].dt.to_period('M')
+        pedidos_por_mes = df_pedidos.groupby('ano_mes').size().reset_index(name='contagem')
+        pedidos_por_mes['ano_mes_str'] = pedidos_por_mes['ano_mes'].astype(str)
         
         fig = px.line(
-            orders_by_month, 
-            x='year_month_str', 
-            y='count',
+            pedidos_por_mes, 
+            x='ano_mes_str', 
+            y='contagem',
             markers=True,
-            title=f'Monthly Order Volume',
-            labels={'year_month_str': 'Month', 'count': 'Number of Orders'}
+            title=f'Volume Mensal de Pedidos',
+            labels={'ano_mes_str': 'Mês', 'contagem': 'Número de Pedidos'}
         )
         fig.update_layout(xaxis_tickangle=45, height=400)
         st.plotly_chart(fig, use_container_width=True)
     
-    # Product and customer distribution
+    # Distribuição de produtos e clientes
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown('<div class="section-header">Product Distribution</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-header">Distribuição de Produtos</div>', unsafe_allow_html=True)
         
-        # Check if we have dimension data
-        if all(col in df_items.columns for col in ['LARGURAINTERNA', 'COMPRIMENTOINTERNO', 'ALTURAINTERNA']):
-            # Calculate volume and create size categories
-            df_items['VOLUME'] = df_items['LARGURAINTERNA'] * df_items['COMPRIMENTOINTERNO'] * df_items['ALTURAINTERNA']
-            df_items['SIZE_CATEGORY'] = pd.qcut(df_items['VOLUME'], 3, labels=['Small', 'Medium', 'Large'])
+        # Verificar se temos dados de dimensão
+        if all(col in df_itens.columns for col in ['VL_LARGURAINTERNA', 'VL_COMPRIMENTOINTERNO', 'VL_ALTURAINTERNA']):
+            # Calcular volume e criar categorias de tamanho
+            df_itens['VOLUME'] = df_itens['VL_LARGURAINTERNA'] * df_itens['VL_COMPRIMENTOINTERNO'] * df_itens['VL_ALTURAINTERNA']
+            df_itens['CATEGORIA_TAMANHO'] = pd.qcut(df_itens['VOLUME'], 3, labels=['Pequeno', 'Médio', 'Grande'])
             
-            size_counts = df_items['SIZE_CATEGORY'].value_counts()
+            contagem_tamanhos = df_itens['CATEGORIA_TAMANHO'].value_counts()
             
             fig = px.pie(
-                values=size_counts.values,
-                names=size_counts.index,
-                title='Product Distribution by Size',
+                values=contagem_tamanhos.values,
+                names=contagem_tamanhos.index,
+                title='Distribuição de Produtos por Tamanho',
                 hole=0.4
             )
             st.plotly_chart(fig, use_container_width=True)
         else:
-            st.info("Dimension data not available for product distribution analysis.")
+            st.info("Dados de dimensão não disponíveis para análise de distribuição de produtos.")
     
     with col2:
-        st.markdown('<div class="section-header">Customer Concentration</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-header">Concentração de Clientes</div>', unsafe_allow_html=True)
         
-        if 'IDCLIENTE' in df_orders.columns:
-            # Customer concentration (Pareto)
-            orders_by_customer = df_orders.groupby('IDCLIENTE').size().sort_values(ascending=False)
-            cumulative_pct = (orders_by_customer.cumsum() / orders_by_customer.sum() * 100)
+        if 'ID_IDCLIENTE' in df_pedidos.columns:
+            # Concentração de clientes (Pareto)
+            pedidos_por_cliente = df_pedidos.groupby('ID_IDCLIENTE').size().sort_values(ascending=False)
+            pct_cumulativo = (pedidos_por_cliente.cumsum() / pedidos_por_cliente.sum() * 100)
             
-            # Create a DataFrame for the top 20 customers
-            top_customers = orders_by_customer.head(20).reset_index()
-            top_customers.columns = ['IDCLIENTE', 'Orders']
-            top_customers['Cumulative %'] = cumulative_pct.loc[top_customers['IDCLIENTE']].values
+            # Criar um DataFrame para os 20 principais clientes
+            principais_clientes = pedidos_por_cliente.head(20).reset_index()
+            principais_clientes.columns = ['ID_IDCLIENTE', 'Pedidos']
+            principais_clientes['% Cumulativo'] = pct_cumulativo.loc[principais_clientes['ID_IDCLIENTE']].values
             
             fig = make_subplots(specs=[[{"secondary_y": True}]])
             
             fig.add_trace(
                 go.Bar(
-                    x=top_customers['IDCLIENTE'],
-                    y=top_customers['Orders'],
-                    name='Orders'
+                    x=principais_clientes['ID_IDCLIENTE'],
+                    y=principais_clientes['Pedidos'],
+                    name='Pedidos'
                 ),
                 secondary_y=False
             )
             
             fig.add_trace(
                 go.Scatter(
-                    x=top_customers['IDCLIENTE'],
-                    y=top_customers['Cumulative %'],
-                    name='Cumulative %',
+                    x=principais_clientes['ID_IDCLIENTE'],
+                    y=principais_clientes['% Cumulativo'],
+                    name='% Cumulativo',
                     mode='lines+markers'
                 ),
                 secondary_y=True
             )
             
             fig.update_layout(
-                title='Top 20 Customers by Order Volume',
-                xaxis_title='Customer ID',
+                title='Top 20 Clientes por Volume de Pedidos',
+                xaxis_title='ID do Cliente',
                 height=400
             )
             
-            fig.update_yaxes(title_text='Number of Orders', secondary_y=False)
-            fig.update_yaxes(title_text='Cumulative %', secondary_y=True)
+            fig.update_yaxes(title_text='Número de Pedidos', secondary_y=False)
+            fig.update_yaxes(title_text='% Cumulativo', secondary_y=True)
             
             st.plotly_chart(fig, use_container_width=True)
         else:
-            st.info("Customer data not available for concentration analysis.")
+            st.info("Dados de cliente não disponíveis para análise de concentração.")
     
-    # Key insights
-    st.markdown('<div class="section-header">Key Business Insights</div>', unsafe_allow_html=True)
+    # Insights principais
+    st.markdown('<div class="section-header">Insights Principais do Negócio</div>', unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
     with col1:
         st.markdown('<div class="insight-box">', unsafe_allow_html=True)
-        st.markdown("**Product Efficiency**")
+        st.markdown("**Eficiência de Produtos**")
         
-        if 'AREALIQUIDAPECA' in df_items.columns and 'AREABRUTAPECA' in df_items.columns:
-            df_items['APROVEITAMENTO_perc'] = (df_items['AREALIQUIDAPECA'] / df_items['AREABRUTAPECA'] * 100).clip(0, 100)
-            avg_efficiency = df_items['APROVEITAMENTO_perc'].mean()
-            low_efficiency = (df_items['APROVEITAMENTO_perc'] < 85).mean() * 100
+        if 'VL_AREALIQUIDAPECA' in df_itens.columns and 'VL_AREABRUTAPECA' in df_itens.columns:
+            df_itens['APROVEITAMENTO_perc'] = (df_itens['VL_AREALIQUIDAPECA'] / df_itens['VL_AREABRUTAPECA'] * 100).clip(0, 100)
+            eficiencia_media = df_itens['APROVEITAMENTO_perc'].mean()
+            baixa_eficiencia = (df_itens['APROVEITAMENTO_perc'] < 85).mean() * 100
             
-            st.markdown(f"Average material utilization: **{avg_efficiency:.1f}%**")
-            st.markdown(f"Products with low efficiency (<85%): **{low_efficiency:.1f}%**")
+            st.markdown(f"Aproveitamento médio de material: **{eficiencia_media:.1f}%**")
+            st.markdown(f"Produtos com baixa eficiência (<85%): **{baixa_eficiencia:.1f}%**")
             
-            if low_efficiency > 20:
-                st.markdown("⚠️ **Action needed**: High percentage of products with low material efficiency.")
+            if baixa_eficiencia > 20:
+                st.markdown("⚠️ **Ação necessária**: Alto percentual de produtos com baixa eficiência de material.")
             else:
-                st.markdown("✅ Good material utilization across product portfolio.")
+                st.markdown("✅ Bom aproveitamento de material em todo o portfólio de produtos.")
         else:
-            st.markdown("Material utilization data not available.")
+            st.markdown("Dados de aproveitamento de material não disponíveis.")
         
         st.markdown('</div>', unsafe_allow_html=True)
     
     with col2:
         st.markdown('<div class="insight-box">', unsafe_allow_html=True)
-        st.markdown("**Customer Concentration Risk**")
+        st.markdown("**Risco de Concentração de Clientes**")
         
-        if 'IDCLIENTE' in df_orders.columns:
-            orders_by_customer = df_orders.groupby('IDCLIENTE').size()
-            top_customer_pct = orders_by_customer.max() / orders_by_customer.sum() * 100
-            top5_pct = orders_by_customer.nlargest(5).sum() / orders_by_customer.sum() * 100
+        if 'ID_IDCLIENTE' in df_pedidos.columns:
+            pedidos_por_cliente = df_pedidos.groupby('ID_IDCLIENTE').size()
+            pct_principal_cliente = pedidos_por_cliente.max() / pedidos_por_cliente.sum() * 100
+            pct_top5 = pedidos_por_cliente.nlargest(5).sum() / pedidos_por_cliente.sum() * 100
             
-            st.markdown(f"Top customer concentration: **{top_customer_pct:.1f}%**")
-            st.markdown(f"Top 5 customers concentration: **{top5_pct:.1f}%**")
+            st.markdown(f"Concentração do cliente principal: **{pct_principal_cliente:.1f}%**")
+            st.markdown(f"Concentração dos 5 principais clientes: **{pct_top5:.1f}%**")
             
-            if top_customer_pct > 30:
-                st.markdown("⚠️ **High risk**: Significant dependence on top customer.")
-            elif top5_pct > 60:
-                st.markdown("⚠️ **Moderate risk**: High concentration in top 5 customers.")
+            if pct_principal_cliente > 30:
+                st.markdown("⚠️ **Alto risco**: Dependência significativa do cliente principal.")
+            elif pct_top5 > 60:
+                st.markdown("⚠️ **Risco moderado**: Alta concentração nos 5 principais clientes.")
             else:
-                st.markdown("✅ Well-diversified customer base.")
+                st.markdown("✅ Base de clientes bem diversificada.")
         else:
-            st.markdown("Customer concentration data not available.")
+            st.markdown("Dados de concentração de clientes não disponíveis.")
         
         st.markdown('</div>', unsafe_allow_html=True)
 
-def display_product_analysis(df_items):
-    """Display product analysis dashboard"""
-    st.markdown('<div class="sub-header">Product Analysis</div>', unsafe_allow_html=True)
+def exibir_analise_produtos(df_itens):
+    """Exibe o dashboard de análise de produtos"""
+    st.markdown('<div class="sub-header">Análise de Produtos</div>', unsafe_allow_html=True)
     
-    # Product dimensions analysis
-    st.markdown('<div class="section-header">Product Dimensions</div>', unsafe_allow_html=True)
+    # Análise de dimensões de produtos
+    st.markdown('<div class="section-header">Dimensões dos Produtos</div>', unsafe_allow_html=True)
     
-    dims = ['LARGURAINTERNA', 'COMPRIMENTOINTERNO', 'ALTURAINTERNA']
-    if all(dim in df_items.columns for dim in dims):
-        # Calculate volume
-        df_items['VOLUME'] = df_items['LARGURAINTERNA'] * df_items['COMPRIMENTOINTERNO'] * df_items['ALTURAINTERNA']
+    dims = ['VL_LARGURAINTERNA', 'VL_COMPRIMENTOINTERNO', 'VL_ALTURAINTERNA']
+    if all(dim in df_itens.columns for dim in dims):
+        # Calcular volume
+        df_itens['VOLUME'] = df_itens['VL_LARGURAINTERNA'] * df_itens['VL_COMPRIMENTOINTERNO'] * df_itens['VL_ALTURAINTERNA']
         
         col1, col2 = st.columns(2)
         
         with col1:
-            # Dimension statistics
-            st.markdown("**Dimension Statistics**")
+            # Estatísticas de dimensão
+            st.markdown("**Estatísticas de Dimensão**")
             
             stats_df = pd.DataFrame({
-                'Dimension': ['Width', 'Length', 'Height', 'Volume'],
-                'Min': [
-                    df_items['LARGURAINTERNA'].min(),
-                    df_items['COMPRIMENTOINTERNO'].min(),
-                    df_items['ALTURAINTERNA'].min(),
-                    df_items['VOLUME'].min()
+                'Dimensão': ['Largura', 'Comprimento', 'Altura', 'Volume'],
+                'Mín': [
+                    df_itens['VL_LARGURAINTERNA'].min(),
+                    df_itens['VL_COMPRIMENTOINTERNO'].min(),
+                    df_itens['VL_ALTURAINTERNA'].min(),
+                    df_itens['VOLUME'].min()
                 ],
-                'Max': [
-                    df_items['LARGURAINTERNA'].max(),
-                    df_items['COMPRIMENTOINTERNO'].max(),
-                    df_items['ALTURAINTERNA'].max(),
-                    df_items['VOLUME'].max()
+                'Máx': [
+                    df_itens['VL_LARGURAINTERNA'].max(),
+                    df_itens['VL_COMPRIMENTOINTERNO'].max(),
+                    df_itens['VL_ALTURAINTERNA'].max(),
+                    df_itens['VOLUME'].max()
                 ],
-                'Mean': [
-                    df_items['LARGURAINTERNA'].mean(),
-                    df_items['COMPRIMENTOINTERNO'].mean(),
-                    df_items['ALTURAINTERNA'].mean(),
-                    df_items['VOLUME'].mean()
+                'Média': [
+                    df_itens['VL_LARGURAINTERNA'].mean(),
+                    df_itens['VL_COMPRIMENTOINTERNO'].mean(),
+                    df_itens['VL_ALTURAINTERNA'].mean(),
+                    df_itens['VOLUME'].mean()
                 ],
-                'Median': [
-                    df_items['LARGURAINTERNA'].median(),
-                    df_items['COMPRIMENTOINTERNO'].median(),
-                    df_items['ALTURAINTERNA'].median(),
-                    df_items['VOLUME'].median()
+                'Mediana': [
+                    df_itens['VL_LARGURAINTERNA'].median(),
+                    df_itens['VL_COMPRIMENTOINTERNO'].median(),
+                    df_itens['VL_ALTURAINTERNA'].median(),
+                    df_itens['VOLUME'].median()
                 ]
             })
             
             st.dataframe(stats_df.round(2), hide_index=True)
         
         with col2:
-            # Size distribution
-            df_items['SIZE_CATEGORY'] = pd.qcut(df_items['VOLUME'], 3, labels=['Small', 'Medium', 'Large'])
-            size_counts = df_items['SIZE_CATEGORY'].value_counts()
+            # Distribuição de tamanho
+            df_itens['CATEGORIA_TAMANHO'] = pd.qcut(df_itens['VOLUME'], 3, labels=['Pequeno', 'Médio', 'Grande'])
+            contagem_tamanhos = df_itens['CATEGORIA_TAMANHO'].value_counts()
             
             fig = px.pie(
-                values=size_counts.values,
-                names=size_counts.index,
-                title='Product Distribution by Size',
+                values=contagem_tamanhos.values,
+                names=contagem_tamanhos.index,
+                title='Distribuição de Produtos por Tamanho',
                 hole=0.4
             )
             st.plotly_chart(fig, use_container_width=True)
         
-        # Dimension relationships
-        st.markdown("**Dimension Relationships**")
+        # Relações de dimensão
+        st.markdown("**Relações de Dimensão**")
         
         fig = px.scatter_3d(
-            df_items.sample(min(1000, len(df_items))),
-            x='LARGURAINTERNA',
-            y='COMPRIMENTOINTERNO',
-            z='ALTURAINTERNA',
-            color='SIZE_CATEGORY',
-            title='3D Visualization of Product Dimensions',
+            df_itens.sample(min(1000, len(df_itens))),
+            x='VL_LARGURAINTERNA',
+            y='VL_COMPRIMENTOINTERNO',
+            z='VL_ALTURAINTERNA',
+            color='CATEGORIA_TAMANHO',
+            title='Visualização 3D das Dimensões dos Produtos',
             labels={
-                'LARGURAINTERNA': 'Width',
-                'COMPRIMENTOINTERNO': 'Length',
-                'ALTURAINTERNA': 'Height'
+                'VL_LARGURAINTERNA': 'Largura',
+                'VL_COMPRIMENTOINTERNO': 'Comprimento',
+                'VL_ALTURAINTERNA': 'Altura'
             }
         )
         fig.update_layout(height=600)
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.info("Product dimension data not available.")
+        st.info("Dados de dimensão de produtos não disponíveis.")
     
-    # Material utilization analysis
-    st.markdown('<div class="section-header">Material Utilization</div>', unsafe_allow_html=True)
+    # Análise de aproveitamento de material
+    st.markdown('<div class="section-header">Aproveitamento de Material</div>', unsafe_allow_html=True)
     
-    if 'AREALIQUIDAPECA' in df_items.columns and 'AREABRUTAPECA' in df_items.columns:
-        df_items['APROVEITAMENTO_perc'] = (df_items['AREALIQUIDAPECA'] / df_items['AREABRUTAPECA'] * 100).clip(0, 100)
+    if 'VL_AREALIQUIDAPECA' in df_itens.columns and 'VL_AREABRUTAPECA' in df_itens.columns:
+        df_itens['APROVEITAMENTO_perc'] = (df_itens['VL_AREALIQUIDAPECA'] / df_itens['VL_AREABRUTAPECA'] * 100).clip(0, 100)
         
         col1, col2 = st.columns(2)
         
         with col1:
-            # Utilization statistics
-            st.markdown("**Material Utilization Statistics**")
+            # Estatísticas de aproveitamento
+            st.markdown("**Estatísticas de Aproveitamento de Material**")
             
-            util_stats = df_items['APROVEITAMENTO_perc'].describe()
+            stats_util = df_itens['APROVEITAMENTO_perc'].describe()
             st.dataframe(pd.DataFrame({
-                'Statistic': ['Mean', 'Median', 'Min', 'Max', 'Std Dev'],
-                'Value': [
-                    f"{util_stats['mean']:.2f}%",
-                    f"{util_stats['50%']:.2f}%",
-                    f"{util_stats['min']:.2f}%",
-                    f"{util_stats['max']:.2f}%",
-                    f"{util_stats['std']:.2f}%"
+                'Estatística': ['Média', 'Mediana', 'Mínimo', 'Máximo', 'Desvio Padrão'],
+                'Valor': [
+                    f"{stats_util['mean']:.2f}%",
+                    f"{stats_util['50%']:.2f}%",
+                    f"{stats_util['min']:.2f}%",
+                    f"{stats_util['max']:.2f}%",
+                    f"{stats_util['std']:.2f}%"
                 ]
             }), hide_index=True)
         
         with col2:
-            # Utilization distribution
+            # Distribuição de aproveitamento
             fig = px.histogram(
-                df_items,
+                df_itens,
                 x='APROVEITAMENTO_perc',
                 nbins=20,
-                title='Distribution of Material Utilization',
-                labels={'APROVEITAMENTO_perc': 'Material Utilization (%)'}
+                title='Distribuição do Aproveitamento de Material',
+                labels={'APROVEITAMENTO_perc': 'Aproveitamento de Material (%)'}
             )
             fig.update_layout(height=300)
             st.plotly_chart(fig, use_container_width=True)
         
-        # Utilization by size category
-        if 'SIZE_CATEGORY' in df_items.columns:
-            st.markdown("**Material Utilization by Product Size**")
+        # Aproveitamento por categoria de tamanho
+        if 'CATEGORIA_TAMANHO' in df_itens.columns:
+            st.markdown("**Aproveitamento de Material por Tamanho do Produto**")
             
-            util_by_size = df_items.groupby('SIZE_CATEGORY')['APROVEITAMENTO_perc'].mean().reset_index()
+            util_por_tamanho = df_itens.groupby('CATEGORIA_TAMANHO')['APROVEITAMENTO_perc'].mean().reset_index()
             
             fig = px.bar(
-                util_by_size,
-                x='SIZE_CATEGORY',
+                util_por_tamanho,
+                x='CATEGORIA_TAMANHO',
                 y='APROVEITAMENTO_perc',
-                title='Average Material Utilization by Product Size',
+                title='Aproveitamento Médio de Material por Tamanho do Produto',
                 labels={
-                    'SIZE_CATEGORY': 'Product Size',
-                    'APROVEITAMENTO_perc': 'Avg. Material Utilization (%)'
+                    'CATEGORIA_TAMANHO': 'Tamanho do Produto',
+                    'APROVEITAMENTO_perc': 'Aproveitamento Médio de Material (%)'
                 }
             )
             fig.update_layout(height=400)
             st.plotly_chart(fig, use_container_width=True)
     else:
-        st.info("Material utilization data not available.")
+        st.info("Dados de aproveitamento de material não disponíveis.")
     
-    # Process flags analysis
-    st.markdown('<div class="section-header">Production Process Analysis</div>', unsafe_allow_html=True)
+    # Análise de flags de processo
+    st.markdown('<div class="section-header">Análise de Processo de Produção</div>', unsafe_allow_html=True)
     
-    flags = ['FLAG_REFILADO', 'FLAG_AMARRADO', 'FLAG_PALETIZADO', 'FLAG_ESPELHO', 'FLAG_FILME']
-    available_flags = [flag for flag in flags if flag in df_items.columns]
+    flags = ['FL_REFILADO', 'FL_AMARRADO', 'FL_PALETIZADO', 'FL_ESPELHO', 'FL_FILME']
+    flags_disponiveis = [flag for flag in flags if flag in df_itens.columns]
     
-    if available_flags:
-        # Process flags distribution
-        flag_data = []
-        for flag in available_flags:
-            yes_count = (df_items[flag] == 1).sum()
-            no_count = (df_items[flag] == 0).sum()
-            flag_data.append({
-                'Process': flag.replace('FLAG_', ''),
-                'Yes': yes_count,
-                'No': no_count,
-                'Yes_pct': yes_count / len(df_items) * 100
+    if flags_disponiveis:
+        # Distribuição de flags de processo
+        dados_flag = []
+        for flag in flags_disponiveis:
+            contagem_sim = (df_itens[flag] == 1).sum()
+            contagem_nao = (df_itens[flag] == 0).sum()
+            dados_flag.append({
+                'Processo': flag.replace('FL_', ''),
+                'Sim': contagem_sim,
+                'Não': contagem_nao,
+                'Sim_pct': contagem_sim / len(df_itens) * 100
             })
         
-        flag_df = pd.DataFrame(flag_data)
+        df_flag = pd.DataFrame(dados_flag)
         
         col1, col2 = st.columns(2)
         
         with col1:
-            # Process flags table
-            st.markdown("**Process Flags Distribution**")
+            # Tabela de flags de processo
+            st.markdown("**Distribuição de Flags de Processo**")
             
-            display_df = flag_df[['Process', 'Yes', 'No', 'Yes_pct']].copy()
-            display_df['Yes_pct'] = display_df['Yes_pct'].round(2).astype(str) + '%'
-            display_df.columns = ['Process', 'Yes Count', 'No Count', 'Yes Percentage']
+            df_exibicao = df_flag[['Processo', 'Sim', 'Não', 'Sim_pct']].copy()
+            df_exibicao['Sim_pct'] = df_exibicao['Sim_pct'].round(2).astype(str) + '%'
+            df_exibicao.columns = ['Processo', 'Contagem Sim', 'Contagem Não', 'Percentual Sim']
             
-            st.dataframe(display_df, hide_index=True)
+            st.dataframe(df_exibicao, hide_index=True)
         
         with col2:
-            # Process flags chart
+            # Gráfico de flags de processo
             fig = px.bar(
-                flag_df,
-                x='Process',
-                y='Yes_pct',
-                title='Percentage of Products with Process Flags',
-                labels={'Process': 'Process', 'Yes_pct': 'Percentage (%)'}
+                df_flag,
+                x='Processo',
+                y='Sim_pct',
+                title='Percentual de Produtos com Flags de Processo',
+                labels={'Processo': 'Processo', 'Sim_pct': 'Percentual (%)'}
             )
             fig.update_layout(height=350)
             st.plotly_chart(fig, use_container_width=True)
     else:
-        st.info("Process flag data not available.")
+        st.info("Dados de flag de processo não disponíveis.")
     
-    # Palletization analysis
-    st.markdown('<div class="section-header">Palletization Analysis</div>', unsafe_allow_html=True)
+    # Análise de paletização
+    st.markdown('<div class="section-header">Análise de Paletização</div>', unsafe_allow_html=True)
     
-    palet_cols = ['PECASPORPACOTE', 'PACOTESPORPALETE', 'PECASPORPALETE']
-    available_palet_cols = [col for col in palet_cols if col in df_items.columns]
+    cols_palet = ['QT_PECASPORPACOTE', 'QT_PACOTESPORPALETE', 'QT_PECASPORPALETE']
+    cols_palet_disponiveis = [col for col in cols_palet if col in df_itens.columns]
     
-    if available_palet_cols:
+    if cols_palet_disponiveis:
         col1, col2 = st.columns(2)
         
         with col1:
-            # Palletization statistics
-            st.markdown("**Palletization Statistics**")
+            # Estatísticas de paletização
+            st.markdown("**Estatísticas de Paletização**")
             
-            palet_stats = []
-            for col in available_palet_cols:
-                stats = df_items[col].describe()
-                palet_stats.append({
-                    'Metric': col.replace('PECAS', 'Pieces').replace('PACOTES', 'Packages').replace('POR', ' per '),
-                    'Mean': stats['mean'],
-                    'Median': stats['50%'],
-                    'Min': stats['min'],
-                    'Max': stats['max']
-                })
-            
-            palet_stats_df = pd.DataFrame(palet_stats)
-            st.dataframe(palet_stats_df.round(2), hide_index=True)
+            stats_palet = []
+            for col in cols_palet_disponiveis:
+                stats = df_itens[col].describe()
+                stats_palet.append({
+                    'Métrica': col.replace('QT_PECAS', 'Peças').replace('QT_PACOTES', 'Pacotes').replace('POR', ' por '), 'Média': stats['mean'], 'Mediana': stats['50%'], 'Mínimo': stats['min'], 'Máximo': stats['max'] })
+            df_stats_palet = pd.DataFrame(stats_palet)
+            st.dataframe(df_stats_palet.round(2), hide_index=True)
         
         with col2:
-            # Pieces per pallet distribution
-            if 'PECASPORPALETE' in available_palet_cols:
+            # Distribuição de peças por palete
+            if 'QT_PECASPORPALETE' in cols_palet_disponiveis:
                 fig = px.histogram(
-                    df_items,
-                    x='PECASPORPALETE',
+                    df_itens,
+                    x='QT_PECASPORPALETE',
                     nbins=20,
-                    title='Distribution of Pieces per Pallet',
-                    labels={'PECASPORPALETE': 'Pieces per Pallet'}
+                    title='Distribuição de Peças por Palete',
+                    labels={'QT_PECASPORPALETE': 'Peças por Palete'}
                 )
                 fig.update_layout(height=350)
                 st.plotly_chart(fig, use_container_width=True)
     else:
-        st.info("Palletization data not available.")
+        st.info("Dados de paletização não disponíveis.")
+def exibir_analise_pedidos(df_pedidos):
+    """Exibe o dashboard de análise de pedidos"""
+    st.markdown('<div class="sub-header">Análise de Pedidos</div>', unsafe_allow_html=True)
+    # Métricas de volume de pedidos
+    st.markdown('<div class="section-header">Volume de Pedidos</div>', unsafe_allow_html=True)
 
-def display_order_analysis(df_orders):
-    """Display order analysis dashboard"""
-    st.markdown('<div class="sub-header">Order Analysis</div>', unsafe_allow_html=True)
-    
-    # Order volume metrics
-    st.markdown('<div class="section-header">Order Volume</div>', unsafe_allow_html=True)
-    
     col1, col2, col3 = st.columns(3)
-    
+
     with col1:
         st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-        st.markdown(f'<div class="metric-value">{len(df_orders):,}</div>', unsafe_allow_html=True)
-        st.markdown('<div class="metric-label">Total Orders</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric-value">{len(df_pedidos):,}</div>', unsafe_allow_html=True)
+        st.markdown('<div class="metric-label">Total de Pedidos</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
-    
+
     with col2:
-        if 'ITEM' in df_orders.columns:
+        if 'ID_ITEM' in df_pedidos.columns:
             st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-            st.markdown(f'<div class="metric-value">{df_orders["ITEM"].nunique():,}</div>', unsafe_allow_html=True)
-            st.markdown('<div class="metric-label">Unique Products Ordered</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-value">{df_pedidos["ID_ITEM"].nunique():,}</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-label">Produtos Únicos Pedidos</div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
         else:
             st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-            st.markdown('<div class="metric-value">N/A</div>', unsafe_allow_html=True)
-            st.markdown('<div class="metric-label">Unique Products</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-value">N/D</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-label">Produtos Únicos</div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
-    
+
     with col3:
-        if 'QUANTIDADEPEDIDA' in df_orders.columns:
+        if 'QT_QUANTIDADEPEDIDA' in df_pedidos.columns:
             st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-            st.markdown(f'<div class="metric-value">{df_orders["QUANTIDADEPEDIDA"].sum():,.0f}</div>', unsafe_allow_html=True)
-            st.markdown('<div class="metric-label">Total Quantity Ordered</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-value">{df_pedidos["QT_QUANTIDADEPEDIDA"].sum():,.0f}</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-label">Quantidade Total Pedida</div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
         else:
             st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-            st.markdown('<div class="metric-value">N/A</div>', unsafe_allow_html=True)
-            st.markdown('<div class="metric-label">Total Quantity</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-value">N/D</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-label">Quantidade Total</div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Time series analysis
-    date_cols = [c for c in df_orders.columns if 'DATA' in c.upper()]
-    if date_cols:
-        st.markdown('<div class="section-header">Order Trends</div>', unsafe_allow_html=True)
-        
-        # Select date column for analysis
-        date_col = st.selectbox(
-            "Select date field for trend analysis:",
-            date_cols
+
+    # Análise de série temporal
+    colunas_data = [c for c in df_pedidos.columns if 'DT_' in c.upper()]
+    if colunas_data:
+        st.markdown('<div class="section-header">Tendências de Pedidos</div>', unsafe_allow_html=True)
+
+        # Selecionar coluna de data para análise
+        coluna_data = st.selectbox(
+            "Selecione o campo de data para análise de tendência:",
+            colunas_data
         )
-        
-        # Create time series by month
-        df_orders['year_month'] = df_orders[date_col].dt.to_period('M')
-        orders_by_month = df_orders.groupby('year_month').size().reset_index(name='count')
-        orders_by_month['year_month_str'] = orders_by_month['year_month'].astype(str)
-        
-        # Create time series by day of week
-        df_orders['day_of_week'] = df_orders[date_col].dt.day_name()
-        day_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-        orders_by_dow = df_orders.groupby('day_of_week').size().reindex(day_order).reset_index(name='count')
-        
+
+        # Criar série temporal por mês
+        df_pedidos['ano_mes'] = df_pedidos[coluna_data].dt.to_period('M')
+        pedidos_por_mes = df_pedidos.groupby('ano_mes').size().reset_index(name='contagem')
+        pedidos_por_mes['ano_mes_str'] = pedidos_por_mes['ano_mes'].astype(str)
+
+        # Criar série temporal por dia da semana
+        df_pedidos['dia_semana'] = df_pedidos[coluna_data].dt.day_name()
+        ordem_dias = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo']
+        pedidos_por_dia = df_pedidos.groupby('dia_semana').size().reindex(ordem_dias).reset_index(name='contagem')
+
         col1, col2 = st.columns(2)
-        
+
         with col1:
-            # Monthly trend
+            # Tendência mensal
             fig = px.line(
-                orders_by_month, 
-                x='year_month_str', 
-                y='count',
+                pedidos_por_mes,
+                x='ano_mes_str',
+                y='contagem',
                 markers=True,
-                title=f'Monthly Order Volume',
-                labels={'year_month_str': 'Month', 'count': 'Number of Orders'}
+                title=f'Volume Mensal de Pedidos',
+                labels={'ano_mes_str': 'Mês', 'contagem': 'Número de Pedidos'}
             )
             fig.update_layout(xaxis_tickangle=45, height=350)
             st.plotly_chart(fig, use_container_width=True)
-        
+
         with col2:
-            # Day of week distribution
+            # Distribuição por dia da semana
             fig = px.bar(
-                orders_by_dow,
-                x='day_of_week',
-                y='count',
-                title='Order Distribution by Day of Week',
-                labels={'day_of_week': 'Day of Week', 'count': 'Number of Orders'}
+                pedidos_por_dia,
+                x='dia_semana',
+                y='contagem',
+                title='Distribuição de Pedidos por Dia da Semana',
+                labels={'dia_semana': 'Dia da Semana', 'contagem': 'Número de Pedidos'}
             )
             fig.update_layout(height=350)
             st.plotly_chart(fig, use_container_width=True)
-        
-        # Seasonality analysis
-        st.markdown("**Seasonality Analysis**")
-        
-        # Create month-only aggregation for seasonality
-        df_orders['month'] = df_orders[date_col].dt.month
-        orders_by_month_only = df_orders.groupby('month').size().reset_index(name='count')
-        orders_by_month_only['month_name'] = orders_by_month_only['month'].apply(lambda x: datetime.date(2000, x, 1).strftime('%B'))
-        
+
+        # Análise de sazonalidade
+        st.markdown("**Análise de Sazonalidade**")
+
+        # Criar agregação apenas por mês para sazonalidade
+        df_pedidos['mes'] = df_pedidos[coluna_data].dt.month
+        pedidos_por_mes_apenas = df_pedidos.groupby('mes').size().reset_index(name='contagem')
+        pedidos_por_mes_apenas['nome_mes'] = pedidos_por_mes_apenas['mes'].apply(lambda x: datetime.date(2000, x, 1).strftime('%B'))
+
         fig = px.bar(
-            orders_by_month_only.sort_values('month'),
-            x='month_name',
-            y='count',
-            title='Seasonal Pattern: Orders by Month',
-            labels={'month_name': 'Month', 'count': 'Number of Orders'}
+            pedidos_por_mes_apenas.sort_values('mes'),
+            x='nome_mes',
+            y='contagem',
+            title='Padrão Sazonal: Pedidos por Mês',
+            labels={'nome_mes': 'Mês', 'contagem': 'Número de Pedidos'}
         )
         fig.update_layout(height=400)
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.info("Date information not available for trend analysis.")
-    
-# app.py (continued)
-    # Order status analysis
-    st.markdown('<div class="section-header">Order Status Analysis</div>', unsafe_allow_html=True)
-    
-    status_cols = [col for col in df_orders.columns if 'STATUS' in col.upper()]
-    if status_cols:
-        # Select status column for analysis
-        status_col = st.selectbox(
-            "Select status field for analysis:",
-            status_cols
+        st.info("Informações de data não disponíveis para análise de tendência.")
+
+    # Análise de status de pedido
+    st.markdown('<div class="section-header">Análise de Status de Pedido</div>', unsafe_allow_html=True)
+
+    colunas_status = [col for col in df_pedidos.columns if 'ST_' in col.upper()]
+    if colunas_status:
+        # Selecionar coluna de status para análise
+        coluna_status = st.selectbox(
+            "Selecione o campo de status para análise:",
+            colunas_status
         )
-        
-        status_counts = df_orders[status_col].value_counts()
-        
+
+        contagem_status = df_pedidos[coluna_status].value_counts()
+
         col1, col2 = st.columns(2)
-        
+
         with col1:
-            # Status distribution table
-            st.markdown("**Order Status Distribution**")
-            
-            status_df = pd.DataFrame({
-                'Status': status_counts.index,
-                'Count': status_counts.values,
-                'Percentage': (status_counts.values / status_counts.sum() * 100).round(2)
+            # Tabela de distribuição de status
+            st.markdown("**Distribuição de Status de Pedido**")
+
+            df_status = pd.DataFrame({
+                'Status': contagem_status.index,
+                'Contagem': contagem_status.values,
+                'Percentual': (contagem_status.values / contagem_status.sum() * 100).round(2)
             })
-            
-            st.dataframe(status_df, hide_index=True)
-        
+
+            st.dataframe(df_status, hide_index=True)
+
         with col2:
-            # Status distribution chart
+            # Gráfico de distribuição de status
             fig = px.pie(
-                values=status_counts.values,
-                names=status_counts.index,
-                title='Order Status Distribution',
+                values=contagem_status.values,
+                names=contagem_status.index,
+                title='Distribuição de Status de Pedido',
                 hole=0.4
             )
             fig.update_layout(height=350)
             st.plotly_chart(fig, use_container_width=True)
-        
-        # Status over time if we have date data
-        if date_cols:
-            st.markdown("**Status Evolution Over Time**")
-            
-            main_date_col = next((col for col in date_cols if 'PEDIDO' in col.upper()), date_cols[0])
-            df_orders['year_month'] = df_orders[main_date_col].dt.to_period('M')
-            df_orders['year_month_str'] = df_orders['year_month'].astype(str)
-            
-            status_by_month = df_orders.groupby(['year_month_str', status_col]).size().reset_index(name='count')
-            
+
+        # Status ao longo do tempo se tivermos dados de data
+        if colunas_data:
+            st.markdown("**Evolução de Status ao Longo do Tempo**")
+
+            coluna_data_principal = next((col for col in colunas_data if 'PEDIDO' in col.upper()), colunas_data[0])
+            df_pedidos['ano_mes'] = df_pedidos[coluna_data_principal].dt.to_period('M')
+            df_pedidos['ano_mes_str'] = df_pedidos['ano_mes'].astype(str)
+
+            status_por_mes = df_pedidos.groupby(['ano_mes_str', coluna_status]).size().reset_index(name='contagem')
+
             fig = px.bar(
-                status_by_month,
-                x='year_month_str',
-                y='count',
-                color=status_col,
-                title='Order Status Evolution Over Time',
-                labels={'year_month_str': 'Month', 'count': 'Number of Orders'}
+                status_por_mes,
+                x='ano_mes_str',
+                y='contagem',
+                color=coluna_status,
+                title='Evolução de Status de Pedido ao Longo do Tempo',
+                labels={'ano_mes_str': 'Mês', 'contagem': 'Número de Pedidos'}
             )
             fig.update_layout(xaxis_tickangle=45, height=500)
             st.plotly_chart(fig, use_container_width=True)
     else:
-        st.info("Status information not available for analysis.")
-    
-    # Order quantity analysis
-    st.markdown('<div class="section-header">Order Quantity Analysis</div>', unsafe_allow_html=True)
-    
-    if 'QUANTIDADEPEDIDA' in df_orders.columns:
+        st.info("Informações de status não disponíveis para análise.")
+
+    # Análise de quantidade de pedido
+    st.markdown('<div class="section-header">Análise de Quantidade de Pedido</div>', unsafe_allow_html=True)
+
+    if 'QT_QUANTIDADEPEDIDA' in df_pedidos.columns:
         col1, col2 = st.columns(2)
-        
+
         with col1:
-            # Quantity statistics
-            st.markdown("**Order Quantity Statistics**")
-            
-            qty_stats = df_orders['QUANTIDADEPEDIDA'].describe()
+            # Estatísticas de quantidade
+            st.markdown("**Estatísticas de Quantidade de Pedido**")
+
+            stats_qtd = df_pedidos['QT_QUANTIDADEPEDIDA'].describe()
             st.dataframe(pd.DataFrame({
-                'Statistic': ['Mean', 'Median', 'Min', 'Max', 'Std Dev'],
-                'Value': [
-                    f"{qty_stats['mean']:.2f}",
-                    f"{qty_stats['50%']:.2f}",
-                    f"{qty_stats['min']:.2f}",
-                    f"{qty_stats['max']:.2f}",
-                    f"{qty_stats['std']:.2f}"
+                'Estatística': ['Média', 'Mediana', 'Mínimo', 'Máximo', 'Desvio Padrão'],
+                'Valor': [
+                    f"{stats_qtd['mean']:.2f}",
+                    f"{stats_qtd['50%']:.2f}",
+                    f"{stats_qtd['min']:.2f}",
+                    f"{stats_qtd['max']:.2f}",
+                    f"{stats_qtd['std']:.2f}"
                 ]
             }), hide_index=True)
-        
+
         with col2:
-            # Quantity distribution
+            # Distribuição de quantidade
             fig = px.histogram(
-                df_orders,
-                x='QUANTIDADEPEDIDA',
+                df_pedidos,
+                x='QT_QUANTIDADEPEDIDA',
                 nbins=20,
-                title='Distribution of Order Quantities',
-                labels={'QUANTIDADEPEDIDA': 'Quantity Ordered'}
+                title='Distribuição de Quantidades de Pedido',
+                labels={'QT_QUANTIDADEPEDIDA': 'Quantidade Pedida'}
             )
             fig.update_layout(height=350)
             st.plotly_chart(fig, use_container_width=True)
-        
-        # Top products by quantity
-        if 'ITEM' in df_orders.columns:
-            st.markdown("**Top Products by Ordered Quantity**")
-            
-            qty_by_product = df_orders.groupby('ITEM')['QUANTIDADEPEDIDA'].sum().sort_values(ascending=False)
-            
+
+        # Principais produtos por quantidade
+        if 'ID_ITEM' in df_pedidos.columns:
+            st.markdown("**Principais Produtos por Quantidade Pedida**")
+
+            qtd_por_produto = df_pedidos.groupby('ID_ITEM')['QT_QUANTIDADEPEDIDA'].sum().sort_values(ascending=False)
+
             fig = px.bar(
-                x=qty_by_product.index[:15],
-                y=qty_by_product.values[:15],
-                title='Top 15 Products by Total Ordered Quantity',
-                labels={'x': 'Product ID', 'y': 'Total Quantity'}
+                x=qtd_por_produto.index[:15],
+                y=qtd_por_produto.values[:15],
+                title='Top 15 Produtos por Quantidade Total Pedida',
+                labels={'x': 'ID do Produto', 'y': 'Quantidade Total'}
             )
             fig.update_layout(height=400)
             st.plotly_chart(fig, use_container_width=True)
     else:
-        st.info("Order quantity data not available for analysis.")
+        st.info("Dados de quantidade de pedido não disponíveis para análise.")
 
-def display_customer_analysis(df_orders):
-    """Display customer analysis dashboard"""
-    st.markdown('<div class="sub-header">Customer Analysis</div>', unsafe_allow_html=True)
-    
-    if 'IDCLIENTE' not in df_orders.columns:
-        st.warning("Customer ID information not available in the dataset.")
+def exibir_analise_clientes(df_pedidos, df_clientes): 
+    """Exibe o dashboard de análise de clientes""" 
+    st.markdown('Análise de Clientes', unsafe_allow_html=True)  
+    if 'ID_IDCLIENTE' not in df_pedidos.columns:
+        st.warning("Informações de ID de cliente não disponíveis no conjunto de dados.")
         return
-    
-    # Customer metrics
-    st.markdown('<div class="section-header">Customer Overview</div>', unsafe_allow_html=True)
-    
+
+    # Métricas de cliente
+    st.markdown('<div class="section-header">Visão Geral de Clientes</div>', unsafe_allow_html=True)
+
     col1, col2, col3 = st.columns(3)
-    
+
     with col1:
         st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-        st.markdown(f'<div class="metric-value">{df_orders["IDCLIENTE"].nunique():,}</div>', unsafe_allow_html=True)
-        st.markdown('<div class="metric-label">Total Customers</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric-value">{df_pedidos["ID_IDCLIENTE"].nunique():,}</div>', unsafe_allow_html=True)
+        st.markdown('<div class="metric-label">Total de Clientes</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
-    
+
     with col2:
-        avg_orders = len(df_orders) / df_orders["IDCLIENTE"].nunique()
+        media_pedidos = len(df_pedidos) / df_pedidos["ID_IDCLIENTE"].nunique()
         st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-        st.markdown(f'<div class="metric-value">{avg_orders:.1f}</div>', unsafe_allow_html=True)
-        st.markdown('<div class="metric-label">Avg Orders per Customer</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric-value">{media_pedidos:.1f}</div>', unsafe_allow_html=True)
+        st.markdown('<div class="metric-label">Média de Pedidos por Cliente</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
-    
+
     with col3:
-        if 'QUANTIDADEPEDIDA' in df_orders.columns:
-            avg_qty = df_orders['QUANTIDADEPEDIDA'].sum() / df_orders["IDCLIENTE"].nunique()
+        if 'QT_QUANTIDADEPEDIDA' in df_pedidos.columns:
+            media_qtd = df_pedidos['QT_QUANTIDADEPEDIDA'].sum() / df_pedidos["ID_IDCLIENTE"].nunique()
             st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-            st.markdown(f'<div class="metric-value">{avg_qty:.1f}</div>', unsafe_allow_html=True)
-            st.markdown('<div class="metric-label">Avg Quantity per Customer</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-value">{media_qtd:.1f}</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-label">Média de Quantidade por Cliente</div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
         else:
             st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-            st.markdown('<div class="metric-value">N/A</div>', unsafe_allow_html=True)
-            st.markdown('<div class="metric-label">Avg Quantity per Customer</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-value">N/D</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-label">Média de Quantidade por Cliente</div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Customer concentration analysis
-    st.markdown('<div class="section-header">Customer Concentration</div>', unsafe_allow_html=True)
-    
-    # Orders by customer
-    orders_by_customer = df_orders.groupby('IDCLIENTE').size().sort_values(ascending=False)
-    
-    # Calculate cumulative percentages
-    total_orders = orders_by_customer.sum()
-    orders_by_customer_pct = orders_by_customer / total_orders * 100
-    cumulative_pct = orders_by_customer_pct.cumsum()
-    
-    # Create ABC classification
-    customer_class = pd.DataFrame({
-        'orders': orders_by_customer,
-        'percentage': orders_by_customer_pct,
-        'cumulative': cumulative_pct
+
+    # Análise de concentração de clientes
+    st.markdown('<div class="section-header">Concentração de Clientes</div>', unsafe_allow_html=True)
+
+    # Pedidos por cliente
+    pedidos_por_cliente = df_pedidos.groupby('ID_IDCLIENTE').size().sort_values(ascending=False)
+
+    # Calcular percentuais cumulativos
+    total_pedidos = pedidos_por_cliente.sum()
+    pct_pedidos_por_cliente = pedidos_por_cliente / total_pedidos * 100
+    pct_cumulativo = pct_pedidos_por_cliente.cumsum()
+
+    # Criar classificação ABC
+    classe_cliente = pd.DataFrame({
+        'pedidos': pedidos_por_cliente,
+        'percentual': pct_pedidos_por_cliente,
+        'cumulativo': pct_cumulativo
     })
-    
-    customer_class['class'] = 'C'
-    customer_class.loc[customer_class['cumulative'] <= 80, 'class'] = 'A'
-    customer_class.loc[(customer_class['cumulative'] > 80) & (customer_class['cumulative'] <= 95), 'class'] = 'B'
-    
-    # Count customers by class
-    customers_by_class = customer_class['class'].value_counts().reindex(['A', 'B', 'C'])
-    
+
+    classe_cliente['classe'] = 'C'
+    classe_cliente.loc[classe_cliente['cumulativo'] <= 80, 'classe'] = 'A'
+    classe_cliente.loc[(classe_cliente['cumulativo'] > 80) & (classe_cliente['cumulativo'] <= 95), 'classe'] = 'B'
+
+    # Contar clientes por classe
+    clientes_por_classe = classe_cliente['classe'].value_counts().reindex(['A', 'B', 'C'])
+
     col1, col2 = st.columns(2)
-    
+
     with col1:
-        # ABC analysis table
-        st.markdown("**Customer ABC Analysis**")
+        # Tabela de análise ABC
+        st.markdown("**Análise ABC de Clientes**")
         
         abc_df = pd.DataFrame({
-            'Class': ['A', 'B', 'C'],
-            'Customers': [
-                customers_by_class['A'],
-                customers_by_class['B'],
-                customers_by_class['C']
+            'Classe': ['A', 'B', 'C'],
+            'Clientes': [
+                clientes_por_classe['A'],
+                clientes_por_classe['B'],
+                clientes_por_classe['C']
             ],
-            'Percentage': [
-                customers_by_class['A'] / len(customer_class) * 100,
-                customers_by_class['B'] / len(customer_class) * 100,
-                customers_by_class['C'] / len(customer_class) * 100
+            'Percentual': [
+                clientes_por_classe['A'] / len(classe_cliente) * 100,
+                clientes_por_classe['B'] / len(classe_cliente) * 100,
+                clientes_por_classe['C'] / len(classe_cliente) * 100
             ],
-            'Orders %': [80, 15, 5]
+            'Pedidos %': [80, 15, 5]
         })
         
-        abc_df['Percentage'] = abc_df['Percentage'].round(2).astype(str) + '%'
-        abc_df['Orders %'] = abc_df['Orders %'].astype(str) + '%'
+        abc_df['Percentual'] = abc_df['Percentual'].round(2).astype(str) + '%'
+        abc_df['Pedidos %'] = abc_df['Pedidos %'].astype(str) + '%'
         
         st.dataframe(abc_df, hide_index=True)
-    
+
     with col2:
-        # ABC analysis chart
+        # Gráfico de análise ABC
         fig = px.pie(
-            values=[customers_by_class['A'], customers_by_class['B'], customers_by_class['C']],
+            values=[clientes_por_classe['A'], clientes_por_classe['B'], clientes_por_classe['C']],
             names=['A', 'B', 'C'],
-            title='Customer Distribution by ABC Class',
+            title='Distribuição de Clientes por Classe ABC',
             hole=0.4
         )
         fig.update_layout(height=350)
         st.plotly_chart(fig, use_container_width=True)
-    
-    # Pareto chart
-    st.markdown("**Customer Pareto Analysis**")
-    
-    # Create a DataFrame for the top 50 customers
-    top_customers = customer_class.head(50).reset_index()
-    top_customers.columns = ['IDCLIENTE', 'Orders', 'Percentage', 'Cumulative', 'Class']
-    
+
+    # Gráfico de Pareto
+    st.markdown("**Análise de Pareto de Clientes**")
+
+    # Criar um DataFrame para os 50 principais clientes
+    principais_clientes = classe_cliente.head(50).reset_index()
+    principais_clientes.columns = ['ID_IDCLIENTE', 'Pedidos', 'Percentual', 'Cumulativo', 'Classe']
+
     fig = make_subplots(specs=[[{"secondary_y": True}]])
-    
+
     fig.add_trace(
         go.Bar(
-            x=top_customers['IDCLIENTE'],
-            y=top_customers['Orders'],
-            name='Orders',
-            marker_color=top_customers['Class'].map({'A': '#1E40AF', 'B': '#60A5FA', 'C': '#BFDBFE'})
+            x=principais_clientes['ID_IDCLIENTE'],
+            y=principais_clientes['Pedidos'],
+            name='Pedidos',
+            marker_color=principais_clientes['Classe'].map({'A': '#1E40AF', 'B': '#60A5FA', 'C': '#BFDBFE'})
         ),
         secondary_y=False
     )
-    
+
     fig.add_trace(
         go.Scatter(
-            x=top_customers['IDCLIENTE'],
-            y=top_customers['Cumulative'],
-            name='Cumulative %',
+            x=principais_clientes['ID_IDCLIENTE'],
+            y=principais_clientes['Cumulativo'],
+            name='% Cumulativo',
             mode='lines+markers',
             line=dict(color='red', width=2)
         ),
         secondary_y=True
     )
-    
-    # Add reference lines for 80% and 95%
+
+    # Adicionar linhas de referência para 80% e 95%
     fig.add_shape(
         type="line",
-        x0=top_customers['IDCLIENTE'].iloc[0],
+        x0=principais_clientes['ID_IDCLIENTE'].iloc[0],
         y0=80,
-        x1=top_customers['IDCLIENTE'].iloc[-1],
+        x1=principais_clientes['ID_IDCLIENTE'].iloc[-1],
         y1=80,
         line=dict(color="green", width=2, dash="dash"),
         yref='y2'
     )
-    
+
     fig.add_shape(
         type="line",
-        x0=top_customers['IDCLIENTE'].iloc[0],
+        x0=principais_clientes['ID_IDCLIENTE'].iloc[0],
         y0=95,
-        x1=top_customers['IDCLIENTE'].iloc[-1],
+        x1=principais_clientes['ID_IDCLIENTE'].iloc[-1],
         y1=95,
         line=dict(color="orange", width=2, dash="dash"),
         yref='y2'
     )
-    
+
     fig.update_layout(
-        title='Top 50 Customers - Pareto Analysis',
-        xaxis_title='Customer ID',
+        title='Top 50 Clientes - Análise de Pareto',
+        xaxis_title='ID do Cliente',
         height=500,
         legend=dict(x=0.01, y=0.99)
     )
-    
-    fig.update_yaxes(title_text='Number of Orders', secondary_y=False)
-    fig.update_yaxes(title_text='Cumulative %', secondary_y=True, range=[0, 100])
-    
+
+    fig.update_yaxes(title_text='Número de Pedidos', secondary_y=False)
+    fig.update_yaxes(title_text='% Cumulativo', secondary_y=True, range=[0, 100])
+
     st.plotly_chart(fig, use_container_width=True)
-    
-    # Customer order patterns
-    st.markdown('<div class="section-header">Customer Order Patterns</div>', unsafe_allow_html=True)
-    
-    # Select top customers for detailed analysis
-    top_n_customers = min(20, df_orders['IDCLIENTE'].nunique())
-    top_customers_list = orders_by_customer.head(top_n_customers).index.tolist()
-    
-    selected_customer = st.selectbox(
-        "Select a customer for detailed analysis:",
-        ["All"] + top_customers_list
+
+    # Padrões de pedido de clientes
+    st.markdown('<div class="section-header">Padrões de Pedido de Clientes</div>', unsafe_allow_html=True)
+
+    # Selecionar principais clientes para análise detalhada
+    top_n_clientes = min(20, df_pedidos['ID_IDCLIENTE'].nunique())
+    lista_principais_clientes = pedidos_por_cliente.head(top_n_clientes).index.tolist()
+
+    cliente_selecionado = st.selectbox(
+        "Selecione um cliente para análise detalhada:",
+        ["Todos"] + lista_principais_clientes
     )
-    
-    if selected_customer != "All":
-        customer_orders = df_orders[df_orders['IDCLIENTE'] == selected_customer]
+
+    if cliente_selecionado != "Todos":
+        pedidos_cliente = df_pedidos[df_pedidos['ID_IDCLIENTE'] == cliente_selecionado]
         
         col1, col2, col3 = st.columns(3)
         
         with col1:
             st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-            st.markdown(f'<div class="metric-value">{len(customer_orders):,}</div>', unsafe_allow_html=True)
-            st.markdown('<div class="metric-label">Total Orders</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-value">{len(pedidos_cliente):,}</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-label">Total de Pedidos</div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
         
         with col2:
-            if 'ITEM' in customer_orders.columns:
+            if 'ID_ITEM' in pedidos_cliente.columns:
                 st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-                st.markdown(f'<div class="metric-value">{customer_orders["ITEM"].nunique():,}</div>', unsafe_allow_html=True)
-                st.markdown('<div class="metric-label">Unique Products</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="metric-value">{pedidos_cliente["ID_ITEM"].nunique():,}</div>', unsafe_allow_html=True)
+                st.markdown('<div class="metric-label">Produtos Únicos</div>', unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
             else:
                 st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-                st.markdown('<div class="metric-value">N/A</div>', unsafe_allow_html=True)
-                st.markdown('<div class="metric-label">Unique Products</div>', unsafe_allow_html=True)
+                st.markdown('<div class="metric-value">N/D</div>', unsafe_allow_html=True)
+                st.markdown('<div class="metric-label">Produtos Únicos</div>', unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
         
         with col3:
-            if 'QUANTIDADEPEDIDA' in customer_orders.columns:
+            if 'QT_QUANTIDADEPEDIDA' in pedidos_cliente.columns:
                 st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-                st.markdown(f'<div class="metric-value">{customer_orders["QUANTIDADEPEDIDA"].sum():,.0f}</div>', unsafe_allow_html=True)
-                st.markdown('<div class="metric-label">Total Quantity</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="metric-value">{pedidos_cliente["QT_QUANTIDADEPEDIDA"].sum():,.0f}</div>', unsafe_allow_html=True)
+                st.markdown('<div class="metric-label">Quantidade Total</div>', unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
             else:
                 st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-                st.markdown('<div class="metric-value">N/A</div>', unsafe_allow_html=True)
-                st.markdown('<div class="metric-label">Total Quantity</div>', unsafe_allow_html=True)
+                st.markdown('<div class="metric-value">N/D</div>', unsafe_allow_html=True)
+                st.markdown('<div class="metric-label">Quantidade Total</div>', unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
         
-        # Time series for customer if we have date data
-        date_cols = [c for c in customer_orders.columns if 'DATA' in c.upper()]
-        if date_cols:
-            main_date_col = next((col for col in date_cols if 'PEDIDO' in col.upper()), date_cols[0])
+        # Série temporal para cliente se tivermos dados de data
+        colunas_data = [c for c in pedidos_cliente.columns if 'DT_' in c.upper()]
+        if colunas_data:
+            coluna_data_principal = next((col for col in colunas_data if 'PEDIDO' in col.upper()), colunas_data[0])
             
-            customer_orders['year_month'] = customer_orders[main_date_col].dt.to_period('M')
-            orders_by_month = customer_orders.groupby('year_month').size().reset_index(name='count')
-            orders_by_month['year_month_str'] = orders_by_month['year_month'].astype(str)
+            pedidos_cliente['ano_mes'] = pedidos_cliente[coluna_data_principal].dt.to_period('M')
+            pedidos_por_mes = pedidos_cliente.groupby('ano_mes').size().reset_index(name='contagem')
+            pedidos_por_mes['ano_mes_str'] = pedidos_por_mes['ano_mes'].astype(str)
             
             fig = px.line(
-                orders_by_month, 
-                x='year_month_str', 
-                y='count',
+                pedidos_por_mes, 
+                x='ano_mes_str', 
+                y='contagem',
                 markers=True,
-                title=f'Monthly Order Volume for Customer {selected_customer}',
-                labels={'year_month_str': 'Month', 'count': 'Number of Orders'}
+                title=f'Volume Mensal de Pedidos para o Cliente {cliente_selecionado}',
+                labels={'ano_mes_str': 'Mês', 'contagem': 'Número de Pedidos'}
             )
             fig.update_layout(xaxis_tickangle=45, height=400)
             st.plotly_chart(fig, use_container_width=True)
         
-        # Top products for this customer
-        if 'ITEM' in customer_orders.columns:
-            st.markdown("**Top Products for Selected Customer**")
+        # Principais produtos para este cliente
+        if 'ID_ITEM' in pedidos_cliente.columns:
+            st.markdown("**Principais Produtos para o Cliente Selecionado**")
             
-            product_counts = customer_orders['ITEM'].value_counts().head(10)
+            contagem_produtos = pedidos_cliente['ID_ITEM'].value_counts().head(10)
             
             fig = px.bar(
-                x=product_counts.index,
-                y=product_counts.values,
-                title=f'Top 10 Products for Customer {selected_customer}',
-                labels={'x': 'Product ID', 'y': 'Number of Orders'}
+                x=contagem_produtos.index,
+                y=contagem_produtos.values,
+                title=f'Top 10 Produtos para o Cliente {cliente_selecionado}',
+                labels={'x': 'ID do Produto', 'y': 'Número de Pedidos'}
             )
             fig.update_layout(height=400)
             st.plotly_chart(fig, use_container_width=True)
     else:
-        # Customer order frequency distribution
-        st.markdown("**Customer Order Frequency Distribution**")
+        # Distribuição de frequência de pedidos de clientes
+        st.markdown("**Distribuição de Frequência de Pedidos de Clientes**")
         
-        # Create frequency bins
-        order_freq = orders_by_customer.reset_index()
-        order_freq.columns = ['IDCLIENTE', 'OrderCount']
+        # Criar bins de frequência
+        freq_pedidos = pedidos_por_cliente.reset_index()
+        freq_pedidos.columns = ['ID_IDCLIENTE', 'ContagemPedidos']
         
-        # Create frequency categories
+        # Criar categorias de frequência
         bins = [0, 1, 5, 10, 20, 50, 100, 1000, float('inf')]
         labels = ['1', '2-5', '6-10', '11-20', '21-50', '51-100', '101-1000', '1000+']
-        order_freq['FrequencyBin'] = pd.cut(order_freq['OrderCount'], bins=bins, labels=labels)
+        freq_pedidos['BinFrequencia'] = pd.cut(freq_pedidos['ContagemPedidos'], bins=bins, labels=labels)
         
-        freq_counts = order_freq['FrequencyBin'].value_counts().sort_index()
+        contagem_freq = freq_pedidos['BinFrequencia'].value_counts().sort_index()
         
         fig = px.bar(
-            x=freq_counts.index,
-            y=freq_counts.values,
-            title='Customer Distribution by Order Frequency',
-            labels={'x': 'Number of Orders', 'y': 'Number of Customers'}
+            x=contagem_freq.index,
+            y=contagem_freq.values,
+            title='Distribuição de Clientes por Frequência de Pedidos',
+            labels={'x': 'Número de Pedidos', 'y': 'Número de Clientes'}
         )
         fig.update_layout(height=400)
         st.plotly_chart(fig, use_container_width=True)
         
-        # Customer recency analysis if we have date data
-        date_cols = [c for c in df_orders.columns if 'DATA' in c.upper()]
-        if date_cols:
-            st.markdown("**Customer Recency Analysis**")
+        # Análise de recência de cliente se tivermos dados de data
+        colunas_data = [c for c in df_pedidos.columns if 'DT_' in c.upper()]
+        if colunas_data:
+            st.markdown("**Análise de Recência de Clientes**")
             
-            main_date_col = next((col for col in date_cols if 'PEDIDO' in col.upper()), date_cols[0])
+            coluna_data_principal = next((col for col in colunas_data if 'PEDIDO' in col.upper()), colunas_data[0])
             
-            # Get the most recent order date for each customer
-            customer_last_order = df_orders.groupby('IDCLIENTE')[main_date_col].max().reset_index()
+            # Obter a data do pedido mais recente para cada cliente
+            ultimo_pedido_cliente = df_pedidos.groupby('ID_IDCLIENTE')[coluna_data_principal].max().reset_index()
             
-            # Calculate days since last order
-            max_date = customer_last_order[main_date_col].max()
-            customer_last_order['DaysSinceLastOrder'] = (max_date - customer_last_order[main_date_col]).dt.days
+            # Calcular dias desde o último pedido
+            data_max = ultimo_pedido_cliente[coluna_data_principal].max()
+            ultimo_pedido_cliente['DiasDesdePedido'] = (data_max - ultimo_pedido_cliente[coluna_data_principal]).dt.days
             
-            # Create recency bins
+            # Criar bins de recência
             bins = [0, 30, 90, 180, 365, float('inf')]
-            labels = ['< 30 days', '30-90 days', '90-180 days', '180-365 days', '> 365 days']
-            customer_last_order['RecencyBin'] = pd.cut(customer_last_order['DaysSinceLastOrder'], bins=bins, labels=labels)
+            labels = ['< 30 dias', '30-90 dias', '90-180 dias', '180-365 dias', '> 365 dias']
+            ultimo_pedido_cliente['BinRecencia'] = pd.cut(ultimo_pedido_cliente['DiasDesdePedido'], bins=bins, labels=labels)
             
-            recency_counts = customer_last_order['RecencyBin'].value_counts().sort_index()
+            contagem_recencia = ultimo_pedido_cliente['BinRecencia'].value_counts().sort_index()
             
             fig = px.bar(
-                x=recency_counts.index,
-                y=recency_counts.values,
-                title='Customer Distribution by Recency',
-                labels={'x': 'Time Since Last Order', 'y': 'Number of Customers'}
+                x=contagem_recencia.index,
+                y=contagem_recencia.values,
+                title='Distribuição de Clientes por Recência',
+                labels={'x': 'Tempo Desde o Último Pedido', 'y': 'Número de Clientes'}
+            )
+            fig.update_layout(height=400)
+            st.plotly_chart(fig, use_container_width=True)    
+
+
+def exibir_analise_facas(df_facas): 
+    """Exibe o dashboard de análise de facas""" 
+    st.markdown('Análise de Facas', unsafe_allow_html=True)
+    # Verificar se temos os dados necessários
+    if df_facas is None:
+        st.warning("Dados de facas não disponíveis.")
+        return
+
+    # Métricas principais
+    st.markdown('<div class="section-header">Visão Geral de Facas</div>', unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric-value">{len(df_facas):,}</div>', unsafe_allow_html=True)
+        st.markdown('<div class="metric-label">Total de Facas</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with col2:
+        if 'ST_STATUS' in df_facas.columns:
+            facas_ativas = df_facas[df_facas['ST_STATUS'] != '5.0'].shape[0]
+            st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-value">{facas_ativas:,}</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-label">Facas Ativas</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+            st.markdown('<div class="metric-value">N/D</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-label">Facas Ativas</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+
+    with col3:
+        if 'FL_DESATIVADOSN' in df_facas.columns:
+            facas_desativadas = df_facas[df_facas['FL_DESATIVADOSN'] == 'Y'].shape[0]
+            st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-value">{facas_desativadas:,}</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-label">Facas Desativadas</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+            st.markdown('<div class="metric-value">N/D</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-label">Facas Desativadas</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+
+    # Análise de status
+    if 'ST_STATUS' in df_facas.columns:
+        st.markdown('<div class="section-header">Análise de Status de Facas</div>', unsafe_allow_html=True)
+        
+        # Mapeamento de status para descrições mais amigáveis
+        status_map = {
+            '1.0': 'Ativo',
+            '2.0': 'Em Manutenção',
+            '3.0': 'Reservado',
+            '4.0': 'Indisponível',
+            '5.0': 'Desmobilizado'
+        }
+        
+        # Adicionar coluna com rótulos de status
+        df_facas['STATUS_LABEL'] = df_facas['ST_STATUS'].map(status_map)
+        
+        # Contagem de status
+        contagem_status = df_facas['STATUS_LABEL'].value_counts()
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Tabela de status
+            st.markdown("**Distribuição de Status de Facas**")
+            
+            df_status = pd.DataFrame({
+                'Status': contagem_status.index,
+                'Contagem': contagem_status.values,
+                'Percentual': (contagem_status.values / contagem_status.sum() * 100).round(2)
+            })
+            
+            st.dataframe(df_status, hide_index=True)
+        
+        with col2:
+            # Gráfico de status
+            fig = px.pie(
+                values=contagem_status.values,
+                names=contagem_status.index,
+                title='Distribuição de Status de Facas',
+                hole=0.4
+            )
+            fig.update_layout(height=350)
+            st.plotly_chart(fig, use_container_width=True)
+
+    # Análise de comprimento de lâmina
+    if 'VL_COMPLAMINA' in df_facas.columns:
+        st.markdown('<div class="section-header">Análise de Comprimento de Lâmina</div>', unsafe_allow_html=True)
+        
+        # Estatísticas de comprimento
+        stats_comp = df_facas['VL_COMPLAMINA'].describe()
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Tabela de estatísticas
+            st.markdown("**Estatísticas de Comprimento de Lâmina**")
+            
+            st.dataframe(pd.DataFrame({
+                'Estatística': ['Média', 'Mediana', 'Mínimo', 'Máximo', 'Desvio Padrão'],
+                'Valor (mm)': [
+                    f"{stats_comp['mean']:.2f}",
+                    f"{stats_comp['50%']:.2f}",
+                    f"{stats_comp['min']:.2f}",
+                    f"{stats_comp['max']:.2f}",
+                    f"{stats_comp['std']:.2f}"
+                ]
+            }), hide_index=True)
+        
+        with col2:
+            # Histograma de comprimento
+            fig = px.histogram(
+                df_facas,
+                x='VL_COMPLAMINA',
+                nbins=20,
+                title='Distribuição de Comprimento de Lâmina',
+                labels={'VL_COMPLAMINA': 'Comprimento da Lâmina (mm)'}
+            )
+            fig.update_layout(height=350)
+            st.plotly_chart(fig, use_container_width=True)
+        
+        # Comprimento por status
+        if 'STATUS_LABEL' in df_facas.columns:
+            st.markdown("**Comprimento de Lâmina por Status**")
+            
+            fig = px.box(
+                df_facas,
+                x='STATUS_LABEL',
+                y='VL_COMPLAMINA',
+                title='Distribuição de Comprimento de Lâmina por Status',
+                labels={'STATUS_LABEL': 'Status', 'VL_COMPLAMINA': 'Comprimento da Lâmina (mm)'},
+                color='STATUS_LABEL'
             )
             fig.update_layout(height=400)
             st.plotly_chart(fig, use_container_width=True)
+        
+        # Comprimento por status e desativação
+        if 'STATUS_LABEL' in df_facas.columns and 'FL_DESATIVADOSN' in df_facas.columns:
+            st.markdown("**Comprimento de Lâmina por Status e Desativação**")
+            
+            fig = px.histogram(
+                    df_facas,
+                    x='VL_COMPLAMINA',
+                    color='FL_DESATIVADOSN',
+                    facet_col='STATUS_LABEL',
+                    title='Distribuição de Comprimento de Lâmina por Status e Desativação',
+                    labels={'VL_COMPLAMINA': 'Comprimento da Lâmina (mm)', 'FL_DESATIVADOSN': 'Desativado (S/N)', 'STATUS_LABEL': 'Status' }, 
+                    color_discrete_map={'Y': 'red', 'N': 'blue'}, 
+                    opacity=0.7, nbins=15 ) 
+            
+            fig.update_layout(height=500) 
+            st.plotly_chart(fig, use_container_width=True)
+        # Análise de inconsistências
+        if 'ST_STATUS' in df_facas.columns and 'FL_DESATIVADOSN' in df_facas.columns:
+            st.markdown('<div class="section-header">Análise de Inconsistências</div>', unsafe_allow_html=True)
+            
+            # Verificar inconsistências entre status e flag de desativação
+            inconsistencias = df_facas[(df_facas['ST_STATUS'] == '5.0') & (df_facas['FL_DESATIVADOSN'] == 'N')]
+            
+            if len(inconsistencias) > 0:
+                st.warning(f"Encontradas {len(inconsistencias)} facas com status 'Desmobilizado' mas não marcadas como desativadas.")
+                
+                # Mostrar detalhes das inconsistências
+                st.dataframe(inconsistencias, use_container_width=True)
+            else:
+                st.success("Não foram encontradas inconsistências entre status e flag de desativação.")       
 
-def display_comparison_analysis(df_items, df_orders):
-    """Display comparison analysis between items and orders"""
-    st.markdown('<div class="sub-header">Comparison Analysis: Items vs Orders</div>', unsafe_allow_html=True)
-    
-    # Structure comparison
-    st.markdown('<div class="section-header">Data Structure Comparison</div>', unsafe_allow_html=True)
-    
-    # Compare columns
-    cols_items = set(df_items.columns)
-    cols_orders = set(df_orders.columns)
-    
-    common_cols = cols_items.intersection(cols_orders)
-    exclusive_items = cols_items - cols_orders
-    exclusive_orders = cols_orders - cols_items
-    
+def exibir_analise_comparativa(df_itens, df_pedidos): 
+    """Exibe análise comparativa entre itens e pedidos""" 
+    st.markdown('Análise Comparativa: Itens vs Pedidos', unsafe_allow_html=True)
+    # Comparação de estrutura
+    st.markdown('<div class="section-header">Comparação de Estrutura de Dados</div>', unsafe_allow_html=True)
+
+    # Comparar colunas
+    cols_itens = set(df_itens.columns)
+    cols_pedidos = set(df_pedidos.columns)
+
+    cols_comuns = cols_itens.intersection(cols_pedidos)
+    exclusivas_itens = cols_itens - cols_pedidos
+    exclusivas_pedidos = cols_pedidos - cols_itens
+
     col1, col2, col3 = st.columns(3)
-    
+
     with col1:
         st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-        st.markdown(f'<div class="metric-value">{len(common_cols)}</div>', unsafe_allow_html=True)
-        st.markdown('<div class="metric-label">Common Columns</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric-value">{len(cols_comuns)}</div>', unsafe_allow_html=True)
+        st.markdown('<div class="metric-label">Colunas Comuns</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
-    
+
     with col2:
         st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-        st.markdown(f'<div class="metric-value">{len(exclusive_items)}</div>', unsafe_allow_html=True)
-        st.markdown('<div class="metric-label">Item-Only Columns</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric-value">{len(exclusivas_itens)}</div>', unsafe_allow_html=True)
+        st.markdown('<div class="metric-label">Colunas Exclusivas de Itens</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
-    
+
     with col3:
         st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-        st.markdown(f'<div class="metric-value">{len(exclusive_orders)}</div>', unsafe_allow_html=True)
-        st.markdown('<div class="metric-label">Order-Only Columns</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric-value">{len(exclusivas_pedidos)}</div>', unsafe_allow_html=True)
+        st.markdown('<div class="metric-label">Colunas Exclusivas de Pedidos</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Visualize column distribution
+
+    # Visualizar distribuição de colunas
     fig = px.pie(
-        values=[len(common_cols), len(exclusive_items), len(exclusive_orders)],
-        names=['Common', 'Item-Only', 'Order-Only'],
-        title='Column Distribution Between Items and Orders',
+        values=[len(cols_comuns), len(exclusivas_itens), len(exclusivas_pedidos)],
+        names=['Comuns', 'Exclusivas de Itens', 'Exclusivas de Pedidos'],
+        title='Distribuição de Colunas Entre Itens e Pedidos',
         hole=0.4
     )
     fig.update_layout(height=400)
     st.plotly_chart(fig, use_container_width=True)
-    
-    # Show column lists
+
+    # Mostrar listas de colunas
     col1, col2 = st.columns(2)
-    
+
     with col1:
-        st.markdown("**Item-Only Columns**")
-        st.write(sorted(exclusive_items))
-    
+        st.markdown("**Colunas Exclusivas de Itens**")
+        st.write(sorted(exclusivas_itens))
+
     with col2:
-        st.markdown("**Order-Only Columns**")
-        st.write(sorted(exclusive_orders))
-    
-    # Item coverage analysis
-    st.markdown('<div class="section-header">Item Coverage Analysis</div>', unsafe_allow_html=True)
-    
-    if 'ITEM' in df_items.columns and 'ITEM' in df_orders.columns:
-        # Convert ITEM to string in both dataframes
-        df_items_item = df_items['ITEM'].astype(str)
-        df_orders_item = df_orders['ITEM'].astype(str)
+        st.markdown("**Colunas Exclusivas de Pedidos**")
+        st.write(sorted(exclusivas_pedidos))
+
+    # Análise de cobertura de itens
+    st.markdown('<div class="section-header">Análise de Cobertura de Itens</div>', unsafe_allow_html=True)
+
+    if 'ID_ITEM' in df_itens.columns and 'ID_ITEM' in df_pedidos.columns:
+        # Converter ID_ITEM para string em ambos os dataframes
+        df_itens_item = df_itens['ID_ITEM'].astype(str)
+        df_pedidos_item = df_pedidos['ID_ITEM'].astype(str)
         
-        # Get unique items in each dataset
-        items_in_items = set(df_items_item.unique())
-        items_in_orders = set(df_orders_item.unique())
+        # Obter itens únicos em cada conjunto de dados
+        itens_em_itens = set(df_itens_item.unique())
+        itens_em_pedidos = set(df_pedidos_item.unique())
         
-        # Calculate intersections
-        items_common = items_in_items.intersection(items_in_orders)
-        items_only_in_items = items_in_items - items_in_orders
-        items_only_in_orders = items_in_orders - items_in_items
+        # Calcular interseções
+        itens_comuns = itens_em_itens.intersection(itens_em_pedidos)
+        itens_apenas_em_itens = itens_em_itens - itens_em_pedidos
+        itens_apenas_em_pedidos = itens_em_pedidos - itens_em_itens
         
         col1, col2, col3 = st.columns(3)
         
         with col1:
             st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-            st.markdown(f'<div class="metric-value">{len(items_common):,}</div>', unsafe_allow_html=True)
-            st.markdown('<div class="metric-label">Items in Both</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-value">{len(itens_comuns):,}</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-label">Itens em Ambos</div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
         
         with col2:
             st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-            st.markdown(f'<div class="metric-value">{len(items_only_in_items):,}</div>', unsafe_allow_html=True)
-            st.markdown('<div class="metric-label">Items without Orders</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-value">{len(itens_apenas_em_itens):,}</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-label">Itens sem Pedidos</div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
         
         with col3:
             st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-            st.markdown(f'<div class="metric-value">{len(items_only_in_orders):,}</div>', unsafe_allow_html=True)
-            st.markdown('<div class="metric-label">Orders without Item Record</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-value">{len(itens_apenas_em_pedidos):,}</div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-label">Pedidos sem Registro de Item</div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
         
-        # Visualize item coverage
+        # Visualizar cobertura de itens
         fig = px.bar(
-            x=['Items in Both', 'Items without Orders', 'Orders without Item Record'],
-            y=[len(items_common), len(items_only_in_items), len(items_only_in_orders)],
-            title='Item Coverage Analysis',
-            labels={'x': 'Category', 'y': 'Count'}
+            x=['Itens em Ambos', 'Itens sem Pedidos', 'Pedidos sem Registro de Item'],
+            y=[len(itens_comuns), len(itens_apenas_em_itens), len(itens_apenas_em_pedidos)],
+            title='Análise de Cobertura de Itens',
+            labels={'x': 'Categoria', 'y': 'Contagem'}
         )
         fig.update_layout(height=400)
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.info("ITEM column not found in both datasets for coverage analysis.")
-    
-    # Value comparison for common columns
-    st.markdown('<div class="section-header">Value Comparison for Common Attributes</div>', unsafe_allow_html=True)
-    
-    # Get common numeric columns
-    common_numeric_cols = get_common_numeric_cols(df_orders, df_items)
-    
-    if common_numeric_cols:
-        st.markdown("**Common Numeric Columns**")
-        st.write(common_numeric_cols)
+        st.info("Coluna ID_ITEM não encontrada em ambos os conjuntos de dados para análise de cobertura.")
+
+    # Comparação de valores para colunas comuns
+    st.markdown('<div class="section-header">Comparação de Valores para Atributos Comuns</div>', unsafe_allow_html=True)
+
+    # Obter colunas numéricas comuns
+    colunas_numericas_comuns = obter_colunas_numericas_comuns(df_pedidos, df_itens)
+
+    if colunas_numericas_comuns:
+        st.markdown("**Colunas Numéricas Comuns**")
+        st.write(colunas_numericas_comuns)
         
-        # Calculate differences between orders and items
-        diff_table = build_diff_table(df_orders, df_items, limit_items=1000)
+        # Calcular diferenças entre pedidos e itens
+        tabela_diff = construir_tabela_diferencas(df_pedidos, df_itens, limite_itens=1000)
         
-        if not diff_table.empty:
-            # Calculate statistics on differences
-            diff_stats = {}
-            for col in common_numeric_cols:
-                diff_col = f"{col}_diff"
-                diff_pct_col = f"{col}_diff_pct"
+        if not tabela_diff.empty:
+            # Calcular estatísticas sobre diferenças
+            stats_diff = {}
+            for col in colunas_numericas_comuns:
+                col_diff = f"{col}_diff"
+                col_diff_pct = f"{col}_diff_pct"
                 
-                if diff_col in diff_table.columns and diff_pct_col in diff_table.columns:
-                    diff_stats[col] = {
-                        'mean_diff': diff_table[diff_col].mean(),
-                        'mean_diff_pct': diff_table[diff_pct_col].mean(),
-                        'items_with_diff': (diff_table[diff_col].abs() > 0.01).sum(),
-                        'pct_items_with_diff': (diff_table[diff_col].abs() > 0.01).mean() * 100
+                if col_diff in tabela_diff.columns and col_diff_pct in tabela_diff.columns:
+                    stats_diff[col] = {
+                        'media_diff': tabela_diff[col_diff].mean(),
+                        'media_diff_pct': tabela_diff[col_diff_pct].mean(),
+                        'itens_com_diff': (tabela_diff[col_diff].abs() > 0.01).sum(),
+                        'pct_itens_com_diff': (tabela_diff[col_diff].abs() > 0.01).mean() * 100
                     }
             
-            if diff_stats:
-                diff_stats_df = pd.DataFrame.from_dict(diff_stats, orient='index')
+            if stats_diff:
+                df_stats_diff = pd.DataFrame.from_dict(stats_diff, orient='index')
                 
-                # Display statistics
-                st.markdown("**Difference Statistics**")
+                # Exibir estatísticas
+                st.markdown("**Estatísticas de Diferença**")
                 
-                display_df = diff_stats_df.copy()
-                display_df['mean_diff_pct'] = display_df['mean_diff_pct'].round(2).astype(str) + '%'
-                display_df['pct_items_with_diff'] = display_df['pct_items_with_diff'].round(2).astype(str) + '%'
-                display_df.columns = ['Mean Difference', 'Mean Difference %', 'Items with Difference', 'Items with Difference %']
+                df_exibicao = df_stats_diff.copy()
+                df_exibicao['media_diff_pct'] = df_exibicao['media_diff_pct'].round(2).astype(str) + '%'
+                df_exibicao['pct_itens_com_diff'] = df_exibicao['pct_itens_com_diff'].round(2).astype(str) + '%'
+                df_exibicao.columns = ['Diferença Média', 'Diferença Média %', 'Itens com Diferença', 'Itens com Diferença %']
                 
-                st.dataframe(display_df, use_container_width=True)
+                st.dataframe(df_exibicao, use_container_width=True)
                 
-                # Visualize differences
-                st.markdown("**Percentage of Items with Differences**")
+                # Visualizar diferenças
+                st.markdown("**Percentual de Itens com Diferenças**")
                 
                 fig = px.bar(
-                    x=diff_stats_df.index,
-                    y=diff_stats_df['pct_items_with_diff'],
-                    title='Percentage of Items with Differences Between Orders and Catalog',
-                    labels={'x': 'Attribute', 'y': 'Items with Difference (%)'}
+                    x=df_stats_diff.index,
+                    y=df_stats_diff['pct_itens_com_diff'],
+                    title='Percentual de Itens com Diferenças Entre Pedidos e Catálogo',
+                    labels={'x': 'Atributo', 'y': 'Itens com Diferença (%)'}
                 )
                 fig.update_layout(height=400)
                 st.plotly_chart(fig, use_container_width=True)
                 
-                # Show examples of differences
-                st.markdown("**Examples of Items with Significant Differences**")
+                # Mostrar exemplos de diferenças
+                st.markdown("**Exemplos de Itens com Diferenças Significativas**")
                 
-                # Find items with large differences
-                significant_diffs = diff_table[diff_table[f"{common_numeric_cols[0]}_diff_pct"].abs() > 5]
-                if not significant_diffs.empty:
-                    st.dataframe(significant_diffs.head(10), use_container_width=True)
+                # Encontrar itens com grandes diferenças
+                diffs_significativas = tabela_diff[tabela_diff[f"{colunas_numericas_comuns[0]}_diff_pct"].abs() > 5]
+                if not diffs_significativas.empty:
+                    st.dataframe(diffs_significativas.head(10), use_container_width=True)
                 else:
-                    st.info("No items with significant differences found.")
+                    st.info("Não foram encontrados itens com diferenças significativas.")
             else:
-                st.info("No difference statistics could be calculated.")
+                st.info("Não foi possível calcular estatísticas de diferença.")
         else:
-            st.info("No difference data could be generated.")
+            st.info("Não foi possível gerar dados de diferença.")
     else:
-        st.info("No common numeric columns found for value comparison.")
-    
-    # Conceptual model explanation
-    st.markdown('<div class="section-header">Conceptual Data Model</div>', unsafe_allow_html=True)
-    
-    st.markdown("""
-    ### Relationship Between Items and Orders
-    
-    Based on the analysis, we can infer the following conceptual model:
-    
-    1. **Items Table (tb_itens)**
-       - Contains the master catalog of all products
-       - Each record represents a unique product identified by ITEM
-       - Stores the current/most recent characteristics of each product
-       - Functions as a reference/catalog table
-    
-    2. **Orders Table (tb_pedidos)**
-       - Contains orders placed by customers
-       - Each record represents a specific order for an item
-       - Stores the characteristics of the item at the time the order was placed
-       - Includes additional information such as order status, delivery dates, quantities
-    
-    3. **Relationship**
-       - An item can have zero, one, or multiple orders
-       - Each order is associated with exactly one item
-       - Item characteristics may change over time, but the order maintains the characteristics from when it was placed
-    
-    ### Key Differences
-    
-    1. **Temporality**: 
-       - Items: represents the current state of the product
-       - Orders: represents the state of the product at the time of order (historical)
-    
-    2. **Exclusive Information**:
-       - Orders: contains transaction information (status, dates, quantities)
-       - Items: contains updated technical and production information
-    
-    3. **Purpose**:
-       - Items: reference for available products
-       - Orders: record of commercial transactions and history
-    """)
+        st.info("Não foram encontradas colunas numéricas comuns para comparação de valores.")
 
+    # Explicação do modelo conceitual
+    st.markdown('<div class="section-header">Modelo Conceitual de Dados</div>', unsafe_allow_html=True)
+
+    st.markdown("""
+    ### Relação Entre Itens e Pedidos
+
+    Com base na análise, podemos inferir o seguinte modelo conceitual:
+
+    1. **Tabela de Itens (tb_itens)**
+    - Contém o catálogo mestre de todos os produtos
+    - Cada registro representa um produto único identificado por ID_ITEM
+    - Armazena as características atuais/mais recentes de cada produto
+    - Funciona como uma tabela de referência/catálogo
+
+    2. **Tabela de Pedidos (tb_pedidos)**
+    - Contém pedidos feitos por clientes
+    - Cada registro representa um pedido específico para um item
+    - Armazena as características do item no momento em que o pedido foi feito
+    - Inclui informações adicionais como status do pedido, datas de entrega, quantidades
+
+    3. **Relacionamento**
+    - Um item pode ter zero, um ou vários pedidos
+    - Cada pedido está associado a exatamente um item
+    - As características do item podem mudar ao longo do tempo, mas o pedido mantém as características de quando foi feito
+
+    ### Diferenças Principais
+
+    1. **Temporalidade**: 
+    - Itens: representa o estado atual do produto
+    - Pedidos: representa o estado do produto no momento do pedido (histórico)
+
+    2. **Informações Exclusivas**:
+    - Pedidos: contém informações de transação (status, datas, quantidades)
+    - Itens: contém informações técnicas e de produção atualizadas
+
+    3. **Propósito**:
+    - Itens: referência para produtos disponíveis
+    - Pedidos: registro de transações comerciais e histórico
+    """)   
+        
 if __name__ == "__main__":
     main()
+
+     
