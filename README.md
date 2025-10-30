@@ -1,1 +1,1 @@
-![lifecycle_ml.png]()
+![Lifecycle do Machine Learning](lifecycle_ml.png)
