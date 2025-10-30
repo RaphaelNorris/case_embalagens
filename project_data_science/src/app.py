@@ -9,7 +9,7 @@ import streamlit as st
 # ---------------------------
 st.set_page_config(
     page_title="Análise de Facas | Embalagens",
-    page_icon="🔪",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded",
 )
