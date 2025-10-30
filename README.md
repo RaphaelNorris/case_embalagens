@@ -1,1 +1,1 @@
-![Uploading lifecycle_ml.png…]()
+![lifecycle_ml.png]()
