@@ -1,0 +1,32 @@
+CREATE TABLE MAQUINA (
+    MAQ_ID                          NUMBER          NOT NULL,
+    MAQUINA                         VARCHAR2(50)    NOT NULL,
+    NOMEMAQUINA                     VARCHAR2(50)    NOT NULL,
+    TIPO                            NUMBER          NOT NULL,
+    CUSTOHORA                       BINARY_DOUBLE   NULL,
+    UNIDPRODUTIVIDADE               NUMBER(5)       NOT NULL,
+    DESCUNIDPRODUTIVIDADE           VARCHAR2(10)    NULL,
+    SETUP                           NUMBER          NOT NULL,
+    PRODM2                          NUMBER          NOT NULL,
+    PRODBATIDAS                     NUMBER          NOT NULL,
+    PRODKG                          NUMBER          NOT NULL,
+    PRODMAQUINA                     NUMBER          NULL,
+    HOMENSTURMA                     NUMBER          NULL,
+    GANTT                           NUMBER(5)       NOT NULL,
+    NRDECORES                       NUMBER          NULL,
+    IDGRUPOMAQUINA                  NUMBER          NULL,
+    TAREFAATUAL                     VARCHAR2(45)    NULL,
+    INICIOTAREFAATUAL               DATE            NULL,
+    FIMPREVTAREFAATUAL              DATE            NULL,
+    PARADAATUAL                     NUMBER          NULL,
+    INICIOPARADAATUAL               DATE            NULL,
+    PROGRAMARPRODUCAO               CHAR(1)         NOT NULL, -- bit
+    CODIGOERP                       VARCHAR2(30)    NULL,
+    PORCMINLARGURARESINADA           NUMBER          NULL,
+    CARGAMAQLOTE                     NUMBER          NOT NULL,
+    REFILEDIRETOPRENSA               CHAR(1)         NOT NULL, -- bit
+    DIFPORCPRODUTMAQFT_MENOS         NUMBER          NOT NULL,
+    DIFPORCPRODUTMAQFT_MAIS          NUMBER          NOT NULL,
+    PEDIDOMINIMOM2                   NUMBER          NOT NULL,
+    CONSTRAINT PK_MAQUINA PRIMARY KEY (MAQ_ID)
+)

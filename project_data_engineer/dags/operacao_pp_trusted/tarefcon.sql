@@ -1,0 +1,38 @@
+CREATE TABLE TAREFCON (
+    IDTAREFCON                     NUMBER          NOT NULL,
+    MAQUINA                        VARCHAR2(50)    NOT NULL,
+    TAREFA                         NUMBER          NOT NULL,
+    FLAGPARADA                     NUMBER(5)       NOT NULL, -- smallint
+    CODIGOPARADAOUCONV             NUMBER          NULL,
+    TURMA                          VARCHAR2(5)     NOT NULL,
+    OP                             VARCHAR2(45)    NULL,
+    PEDIDO                         VARCHAR2(21)    NULL,
+    ITEM                           VARCHAR2(20)    NULL,
+    REPROGRAMACAO                  NUMBER          NULL,
+    PASSAGENS                      NUMBER          NULL,
+    ARRANJO                        NUMBER          NULL,
+    GRAMATURA                      NUMBER          NULL,
+    QUANTIDADEPROGRAMADA           NUMBER          NULL,
+    CHAPASALIMENTADAS              NUMBER          NULL,
+    QUANTIDADEPRODUZIDA            NUMBER          NULL,
+    QUANTIDADEAJUSTE               NUMBER          NULL,
+    DURACAOPREVISTA                NUMBER          NULL,
+    INICIO                         DATE            NOT NULL,
+    FIM                            DATE            NOT NULL,
+    DIADATURMA                     DATE            NOT NULL,
+    IDCLIENTE                      NUMBER          NULL,
+    USUARIO                        NUMBER          NULL,
+    DATACRIACAO                    DATE            NOT NULL,
+    USUARIOULTALTERACAO            NUMBER          NULL,
+    DATAULTIMAALTERACAO            DATE            NOT NULL,
+    ORIGEMREGISTRO                 NUMBER          NULL,
+    DESCORIGEMREGISTRO             VARCHAR2(100)   NULL,
+	SKIPFEED                       NUMBER(5)       NOT NULL, -- smallint
+    OPONDULADA                     VARCHAR2(45)    NULL,
+    TAREFAPRODUCAO                 NUMBER          NULL,
+    REFILEDIRETOPRENSA             CHAR(1)         NOT NULL, -- bit
+    DURACAO                        NUMBER          NULL,
+    IDSECAOMAQUINAPARADA           NUMBER          NULL,
+    FACA                           VARCHAR2(30)    NULL,
+    CONSTRAINT PK_TAREFCON PRIMARY KEY (IDTAREFCON)
+)
