@@ -1,0 +1,28 @@
+from datetime import datetime
+from airflow import DAG
+from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
+
+with DAG(
+    dag_id="dag_spark_submit_demo",
+    start_date=datetime(2024, 1, 1),
+    schedule=None,            # (equivalente a schedule_interval=None)
+    catchup=False,
+    tags=["spark", "teste"],
+) as dag:
+
+    wordcount = SparkSubmitOperator(
+        task_id="wordcount",
+        application="/home/adami/airflow/jobs/wordcount.py",   # seu app PySpark
+        conn_id="spark_default",                                # usa a connection
+        name="wordcount-demo",
+        master="local[*]",                                      # força o master
+        spark_binary="/opt/spark/bin/spark-submit",             # caminho explícito do spark-submit
+        verbose=True,
+        env_vars={                                              # garante o ambiente certo
+            "PYSPARK_PYTHON": "/home/adami/airflow_venv/bin/python",
+            "JAVA_HOME": "/usr/lib/jvm/java-17-openjdk-amd64",
+            "SPARK_HOME": "/opt/spark",
+        },
+        # conf={"spark.executor.memory": "1g"},                 # opcional
+        # application_args=[],                                   # opcional
+    )

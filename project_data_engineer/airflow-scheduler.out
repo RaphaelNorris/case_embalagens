@@ -1,0 +1,113 @@
+[[34m2025-10-30T15:35:59.821-0300[0m] {[34mscheduler_job_runner.py:[0m798} INFO[0m - Starting the scheduler[0m
+[[34m2025-10-30T15:35:59.823-0300[0m] {[34mscheduler_job_runner.py:[0m805} INFO[0m - Processing each file at most -1 times[0m
+[[34m2025-10-30T15:35:59.832-0300[0m] {[34mmanager.py:[0m166} INFO[0m - Launched DagFileProcessorManager with pid: 3632368[0m
+[[34m2025-10-30T15:35:59.835-0300[0m] {[34mscheduler_job_runner.py:[0m1598} INFO[0m - Adopting or resetting orphaned tasks for active dag runs[0m
+[[34m2025-10-30T15:35:59.840-0300[0m] {[34msettings.py:[0m59} INFO[0m - Configured default timezone Timezone('UTC')[0m
+[2025-10-30T15:35:59.863-0300] {manager.py:410} WARNING - Because we cannot use more than 1 thread (parsing_processes = 2) when using sqlite. So we set parallelism to 1.
+[[34m2025-10-30T15:36:00.057-0300[0m] {[34mscheduler_job_runner.py:[0m1662} INFO[0m - Reset the following 1 orphaned TaskInstances:
+	<TaskInstance: etl_tarefcon.merge_upsert_tarefcon manual__2025-10-29T17:25:00+00:00 [running]>[0m
+[[34m2025-10-30T15:36:00.653-0300[0m] {[34mscheduler_job_runner.py:[0m414} INFO[0m - 2 tasks up for execution:
+	<TaskInstance: etl_tarefcon.merge_upsert_tarefcon manual__2025-10-29T17:25:00+00:00 [scheduled]>
+	<TaskInstance: etl_pedidos_raw_to_trusted_otimizadao.merge_upsert_pedidos manual__2025-10-30T18:35:22.024870+00:00 [scheduled]>[0m
+[[34m2025-10-30T15:36:00.654-0300[0m] {[34mscheduler_job_runner.py:[0m477} INFO[0m - DAG etl_tarefcon has 0/16 running and queued tasks[0m
+[[34m2025-10-30T15:36:00.654-0300[0m] {[34mscheduler_job_runner.py:[0m477} INFO[0m - DAG etl_pedidos_raw_to_trusted_otimizadao has 0/16 running and queued tasks[0m
+[[34m2025-10-30T15:36:00.654-0300[0m] {[34mscheduler_job_runner.py:[0m593} INFO[0m - Setting the following tasks to queued state:
+	<TaskInstance: etl_tarefcon.merge_upsert_tarefcon manual__2025-10-29T17:25:00+00:00 [scheduled]>
+	<TaskInstance: etl_pedidos_raw_to_trusted_otimizadao.merge_upsert_pedidos manual__2025-10-30T18:35:22.024870+00:00 [scheduled]>[0m
+[[34m2025-10-30T15:36:00.659-0300[0m] {[34mtaskinstance.py:[0m1441} WARNING[0m - cannot record scheduled_duration for task merge_upsert_pedidos because previous state change time has not been saved[0m
+[[34m2025-10-30T15:36:00.660-0300[0m] {[34mscheduler_job_runner.py:[0m636} INFO[0m - Sending TaskInstanceKey(dag_id='etl_tarefcon', task_id='merge_upsert_tarefcon', run_id='manual__2025-10-29T17:25:00+00:00', try_number=4, map_index=-1) to executor with priority 1 and queue default[0m
+[[34m2025-10-30T15:36:00.660-0300[0m] {[34mbase_executor.py:[0m144} INFO[0m - Adding to queue: ['airflow', 'tasks', 'run', 'etl_tarefcon', 'merge_upsert_tarefcon', 'manual__2025-10-29T17:25:00+00:00', '--local', '--subdir', 'DAGS_FOLDER/sql/raw/dag_tarefcon.py'][0m
+[[34m2025-10-30T15:36:00.662-0300[0m] {[34mscheduler_job_runner.py:[0m636} INFO[0m - Sending TaskInstanceKey(dag_id='etl_pedidos_raw_to_trusted_otimizadao', task_id='merge_upsert_pedidos', run_id='manual__2025-10-30T18:35:22.024870+00:00', try_number=1, map_index=-1) to executor with priority 1 and queue default[0m
+[[34m2025-10-30T15:36:00.662-0300[0m] {[34mbase_executor.py:[0m144} INFO[0m - Adding to queue: ['airflow', 'tasks', 'run', 'etl_pedidos_raw_to_trusted_otimizadao', 'merge_upsert_pedidos', 'manual__2025-10-30T18:35:22.024870+00:00', '--local', '--subdir', 'DAGS_FOLDER/sql/trusted/dag_pedidos_trusted_merge.py'][0m
+[[34m2025-10-30T15:36:00.670-0300[0m] {[34msequential_executor.py:[0m74} INFO[0m - Executing command: ['airflow', 'tasks', 'run', 'etl_tarefcon', 'merge_upsert_tarefcon', 'manual__2025-10-29T17:25:00+00:00', '--local', '--subdir', 'DAGS_FOLDER/sql/raw/dag_tarefcon.py'][0m
+[[34m2025-10-30T15:36:00.672-0300[0m] {[34mscheduler_job_runner.py:[0m862} ERROR[0m - Exception when executing SchedulerJob._run_scheduler_loop[0m
+Traceback (most recent call last):
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/jobs/scheduler_job_runner.py", line 845, in _execute
+    self._run_scheduler_loop()
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/jobs/scheduler_job_runner.py", line 979, in _run_scheduler_loop
+    self.job.executor.heartbeat()
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/executors/base_executor.py", line 237, in heartbeat
+    self.sync()
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/executors/sequential_executor.py", line 77, in sync
+    subprocess.check_call(command, close_fds=True)
+  File "/usr/lib/python3.10/subprocess.py", line 364, in check_call
+    retcode = call(*popenargs, **kwargs)
+  File "/usr/lib/python3.10/subprocess.py", line 345, in call
+    with Popen(*popenargs, **kwargs) as p:
+  File "/usr/lib/python3.10/subprocess.py", line 971, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/usr/lib/python3.10/subprocess.py", line 1863, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'airflow'[0m
+[[34m2025-10-30T15:36:00.675-0300[0m] {[34msequential_executor.py:[0m74} INFO[0m - Executing command: ['airflow', 'tasks', 'run', 'etl_tarefcon', 'merge_upsert_tarefcon', 'manual__2025-10-29T17:25:00+00:00', '--local', '--subdir', 'DAGS_FOLDER/sql/raw/dag_tarefcon.py'][0m
+[[34m2025-10-30T15:36:00.676-0300[0m] {[34mscheduler_job_runner.py:[0m868} ERROR[0m - Exception when executing Executor.end[0m
+Traceback (most recent call last):
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/jobs/scheduler_job_runner.py", line 845, in _execute
+    self._run_scheduler_loop()
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/jobs/scheduler_job_runner.py", line 979, in _run_scheduler_loop
+    self.job.executor.heartbeat()
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/executors/base_executor.py", line 237, in heartbeat
+    self.sync()
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/executors/sequential_executor.py", line 77, in sync
+    subprocess.check_call(command, close_fds=True)
+  File "/usr/lib/python3.10/subprocess.py", line 364, in check_call
+    retcode = call(*popenargs, **kwargs)
+  File "/usr/lib/python3.10/subprocess.py", line 345, in call
+    with Popen(*popenargs, **kwargs) as p:
+  File "/usr/lib/python3.10/subprocess.py", line 971, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/usr/lib/python3.10/subprocess.py", line 1863, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'airflow'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/jobs/scheduler_job_runner.py", line 866, in _execute
+    self.job.executor.end()
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/executors/sequential_executor.py", line 87, in end
+    self.heartbeat()
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/executors/base_executor.py", line 237, in heartbeat
+    self.sync()
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/executors/sequential_executor.py", line 77, in sync
+    subprocess.check_call(command, close_fds=True)
+  File "/usr/lib/python3.10/subprocess.py", line 364, in check_call
+    retcode = call(*popenargs, **kwargs)
+  File "/usr/lib/python3.10/subprocess.py", line 345, in call
+    with Popen(*popenargs, **kwargs) as p:
+  File "/usr/lib/python3.10/subprocess.py", line 971, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/usr/lib/python3.10/subprocess.py", line 1863, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'airflow'[0m
+[[34m2025-10-30T15:36:01.707-0300[0m] {[34mprocess_utils.py:[0m131} INFO[0m - Sending Signals.SIGTERM to group 3632368. PIDs of all processes in the group: [3632368][0m
+[[34m2025-10-30T15:36:01.707-0300[0m] {[34mprocess_utils.py:[0m86} INFO[0m - Sending the signal Signals.SIGTERM to group 3632368[0m
+[[34m2025-10-30T15:36:01.841-0300[0m] {[34mprocess_utils.py:[0m79} INFO[0m - Process psutil.Process(pid=3632368, status='terminated', exitcode=0, started='15:35:59') (3632368) terminated with exit code 0[0m
+[[34m2025-10-30T15:36:01.842-0300[0m] {[34mscheduler_job_runner.py:[0m874} INFO[0m - Exited execute loop[0m
+[[34m2025-10-30T15:36:01.857-0300[0m] {[34mscheduler_command.py:[0m49} ERROR[0m - Exception when running scheduler job[0m
+Traceback (most recent call last):
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/cli/commands/scheduler_command.py", line 47, in _run_scheduler_job
+    run_job(job=job_runner.job, execute_callable=job_runner._execute)
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/utils/session.py", line 77, in wrapper
+    return func(*args, session=session, **kwargs)
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/jobs/job.py", line 289, in run_job
+    return execute_job(job, execute_callable=execute_callable)
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/jobs/job.py", line 318, in execute_job
+    ret = execute_callable()
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/jobs/scheduler_job_runner.py", line 845, in _execute
+    self._run_scheduler_loop()
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/jobs/scheduler_job_runner.py", line 979, in _run_scheduler_loop
+    self.job.executor.heartbeat()
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/executors/base_executor.py", line 237, in heartbeat
+    self.sync()
+  File "/home/adami/airflow_272_py310/lib/python3.10/site-packages/airflow/executors/sequential_executor.py", line 77, in sync
+    subprocess.check_call(command, close_fds=True)
+  File "/usr/lib/python3.10/subprocess.py", line 364, in check_call
+    retcode = call(*popenargs, **kwargs)
+  File "/usr/lib/python3.10/subprocess.py", line 345, in call
+    with Popen(*popenargs, **kwargs) as p:
+  File "/usr/lib/python3.10/subprocess.py", line 971, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/usr/lib/python3.10/subprocess.py", line 1863, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'airflow'[0m
