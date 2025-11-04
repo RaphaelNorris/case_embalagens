@@ -70,7 +70,7 @@
 <th>COMMENTS</th>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 0)" class="currentrow">
-<td class="currentcell">MAQUINA</td>
+<td class="currentcell">ID_MAQUINA</td>
 <td class="currentcell">VARCHAR2(50&nbsp;BYTE)</td>
 <td class="currentcell">Yes</td>
 <td class="currentcell">null</td>
@@ -78,23 +78,23 @@
 <td class="currentcell">Identificação&nbsp;ou&nbsp;nome&nbsp;da&nbsp;máquina&nbsp;responsável&nbsp;pela&nbsp;tarefa&nbsp;ou&nbsp;produção</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 1)">
-<td>FLAGPARADA</td>
-<td>NUMBER(5,0)</td>
+<td>FL_PARADA</td>
+<td>VARCHAR2(1&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>2</td>
 <td>Indicador&nbsp;de&nbsp;parada&nbsp;(1&nbsp;=&nbsp;houve&nbsp;parada,&nbsp;0&nbsp;=&nbsp;operação&nbsp;normal)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 2)">
-<td>CODIGOPARADAOUCONV</td>
-<td>NUMBER</td>
+<td>CD_PARADAOUCONV</td>
+<td>VARCHAR2(20&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>3</td>
 <td>Código&nbsp;que&nbsp;identifica&nbsp;o&nbsp;tipo&nbsp;de&nbsp;parada&nbsp;ou&nbsp;conversão&nbsp;da&nbsp;máquina</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 3)">
-<td>TURMA</td>
+<td>TX_TURMA</td>
 <td>VARCHAR2(5&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
@@ -102,7 +102,7 @@
 <td>Código&nbsp;da&nbsp;turma&nbsp;ou&nbsp;turno&nbsp;responsável&nbsp;pela&nbsp;operação&nbsp;-&nbsp;A&nbsp;;&nbsp;B&nbsp;;&nbsp;C</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 4)">
-<td>OP</td>
+<td>TX_OP</td>
 <td>VARCHAR2(45&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
@@ -110,7 +110,7 @@
 <td>Número&nbsp;da&nbsp;Ordem&nbsp;de&nbsp;Produção&nbsp;(OP)&nbsp;associada&nbsp;à&nbsp;tarefa</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 5)">
-<td>PEDIDO</td>
+<td>ID_PEDIDO</td>
 <td>VARCHAR2(21&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
@@ -118,7 +118,7 @@
 <td>Número&nbsp;do&nbsp;pedido&nbsp;de&nbsp;venda&nbsp;vinculado&nbsp;à&nbsp;produção</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 6)">
-<td>ITEM</td>
+<td>ID_ITEM</td>
 <td>VARCHAR2(20&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
@@ -126,7 +126,7 @@
 <td>Código&nbsp;do&nbsp;item&nbsp;ou&nbsp;produto&nbsp;dentro&nbsp;do&nbsp;pedido</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 7)">
-<td>REPROGRAMACAO</td>
+<td>VL_REPROGRAMACAO</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -134,7 +134,7 @@
 <td>Indicador&nbsp;se&nbsp;houve&nbsp;reprogramação&nbsp;da&nbsp;tarefa&nbsp;1-Prod.&nbsp;Normal&nbsp;;&nbsp;>=2&nbsp;Reprog.&nbsp;Necessárias</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 8)">
-<td>ARRANJO</td>
+<td>QT_ARRANJO</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -142,7 +142,7 @@
 <td>Número&nbsp;ou&nbsp;código&nbsp;do&nbsp;arranjo&nbsp;produtivo&nbsp;utilizado&nbsp;na&nbsp;operação</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 9)">
-<td>GRAMATURA</td>
+<td>VL_GRAMATURA</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -150,7 +150,7 @@
 <td>Gramatura&nbsp;do&nbsp;material&nbsp;em&nbsp;produção&nbsp;(peso&nbsp;por&nbsp;metro&nbsp;quadrado)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 10)">
-<td>QUANTIDADEPROGRAMADA</td>
+<td>QT_PROGRAMADA</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -158,7 +158,7 @@
 <td>Quantidade&nbsp;total&nbsp;programada&nbsp;para&nbsp;produção&nbsp;nesta&nbsp;tarefa</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 11)">
-<td>CHAPASALIMENTADAS</td>
+<td>VL_CHAPASALIMENTADAS</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -166,7 +166,7 @@
 <td>Número&nbsp;de&nbsp;chapas&nbsp;alimentadas&nbsp;na&nbsp;máquina&nbsp;durante&nbsp;a&nbsp;execução</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 12)">
-<td>QUANTIDADEPRODUZIDA</td>
+<td>QT_PRODUZIDA</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -174,7 +174,7 @@
 <td>Quantidade&nbsp;efetivamente&nbsp;produzida&nbsp;na&nbsp;tarefa</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 13)">
-<td>QUANTIDADEAJUSTE</td>
+<td>QT_AJUSTE</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -182,7 +182,7 @@
 <td>Quantidade&nbsp;utilizada&nbsp;em&nbsp;ajustes,&nbsp;testes&nbsp;ou&nbsp;perdas&nbsp;de&nbsp;setup</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 14)">
-<td>DURACAOPREVISTA</td>
+<td>VL_DURACAOPREVISTA</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -190,47 +190,47 @@
 <td>Duração&nbsp;prevista&nbsp;da&nbsp;tarefa&nbsp;(em&nbsp;minutos&nbsp;ou&nbsp;horas,&nbsp;conforme&nbsp;padrão)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 15)">
-<td>INICIO</td>
-<td>DATE</td>
+<td>DT_INICIO</td>
+<td>TIMESTAMP(6)</td>
 <td>Yes</td>
 <td>null</td>
 <td>16</td>
 <td>Data&nbsp;e&nbsp;hora&nbsp;de&nbsp;início&nbsp;da&nbsp;tarefa&nbsp;de&nbsp;produção</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 16)">
-<td>FIM</td>
-<td>DATE</td>
+<td>DT_FIM</td>
+<td>TIMESTAMP(6)</td>
 <td>Yes</td>
 <td>null</td>
 <td>17</td>
 <td>Data&nbsp;e&nbsp;hora&nbsp;de&nbsp;término&nbsp;da&nbsp;tarefa&nbsp;de&nbsp;produção</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 17)">
-<td>DIADATURMA</td>
-<td>DATE</td>
+<td>DT_DIADATURMA</td>
+<td>TIMESTAMP(6)</td>
 <td>Yes</td>
 <td>null</td>
 <td>18</td>
 <td>Data&nbsp;de&nbsp;referência&nbsp;do&nbsp;dia&nbsp;de&nbsp;trabalho&nbsp;da&nbsp;turma&nbsp;(turno)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 18)">
-<td>IDCLIENTE</td>
-<td>NUMBER</td>
+<td>ID_CLIENTE</td>
+<td>VARCHAR2(20&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>19</td>
 <td>Identificador&nbsp;único&nbsp;do&nbsp;cliente&nbsp;relacionado&nbsp;ao&nbsp;pedido</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 19)">
-<td>USUARIO</td>
-<td>NUMBER</td>
+<td>ID_USUARIO</td>
+<td>VARCHAR2(20&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>20</td>
 <td>Identificador&nbsp;do&nbsp;usuário&nbsp;responsável&nbsp;pelo&nbsp;registro&nbsp;ou&nbsp;operação</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 20)">
-<td>ORIGEMREGISTRO</td>
+<td>VL_ORIGEMREGISTRO</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -238,7 +238,7 @@
 <td>Código&nbsp;que&nbsp;representa&nbsp;a&nbsp;origem&nbsp;do&nbsp;registro&nbsp;1&nbsp;-&nbsp;Apont.&nbsp;Aut.&nbsp;;&nbsp;0&nbsp;-&nbsp;Apont.&nbsp;Manual</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 21)">
-<td>DESCORIGEMREGISTRO</td>
+<td>TX_DESCORIGEMREGISTRO</td>
 <td>VARCHAR2(100&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
@@ -246,15 +246,15 @@
 <td>Descrição&nbsp;textual&nbsp;da&nbsp;origem&nbsp;do&nbsp;registro</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 22)">
-<td>SKIPFEED</td>
-<td>NUMBER</td>
+<td>FL_SKIPFEED</td>
+<td>VARCHAR2(1&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>23</td>
 <td>Indicador&nbsp;técnico&nbsp;utilizado&nbsp;para&nbsp;controle&nbsp;de&nbsp;alimentação&nbsp;de&nbsp;material&nbsp;(skip&nbsp;feed)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 23)">
-<td>OPONDULADA</td>
+<td>TX_OPONDULADA</td>
 <td>VARCHAR2(45&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
@@ -262,7 +262,7 @@
 <td>Número&nbsp;da&nbsp;Ordem&nbsp;de&nbsp;Produção&nbsp;da&nbsp;onduladeira,&nbsp;quando&nbsp;aplicável</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 24)">
-<td>DURACAO</td>
+<td>VL_DURACAO</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -270,7 +270,7 @@
 <td>Duração&nbsp;real&nbsp;da&nbsp;tarefa&nbsp;em&nbsp;Minutos&nbsp;(Fim&nbsp;-&nbsp;Início)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 25)">
-<td>FACA</td>
+<td>CD_FACA</td>
 <td>VARCHAR2(30&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
@@ -339,27 +339,27 @@
 </tr>
 <tr>
 <td>NUM_ROWS</td>
-<td>2878657</td>
+<td>420000</td>
 </tr>
 <tr>
 <td>BLOCKS</td>
-<td>39677</td>
+<td>7300</td>
 </tr>
 <tr>
 <td>AVG_ROW_LEN</td>
-<td>93</td>
+<td>126</td>
 </tr>
 <tr>
 <td>SAMPLE_SIZE</td>
-<td>2878657</td>
+<td>420000</td>
 </tr>
 <tr>
 <td>LAST_ANALYZED</td>
-<td>07/10/25</td>
+<td>28/10/25</td>
 </tr>
 <tr>
 <td>LAST_ANALYZED_SINCE</td>
-<td>07/10/25</td>
+<td>28/10/25</td>
 </tr>
 </table>
 <br/>
@@ -440,7 +440,7 @@
 </tr>
 <tr>
 <td>LAST_DDL_TIME</td>
-<td>15/10/25</td>
+<td>28/10/25</td>
 </tr>
 <tr>
 <td>OWNER</td>
@@ -520,11 +520,11 @@
 </tr>
 <tr>
 <td>NUM_ROWS</td>
-<td>2878657</td>
+<td>420000</td>
 </tr>
 <tr>
 <td>BLOCKS</td>
-<td>39677</td>
+<td>7300</td>
 </tr>
 <tr>
 <td>EMPTY_BLOCKS</td>
@@ -540,7 +540,7 @@
 </tr>
 <tr>
 <td>AVG_ROW_LEN</td>
-<td>93</td>
+<td>126</td>
 </tr>
 <tr>
 <td>AVG_SPACE_FREELIST_BLOCKS</td>
@@ -568,11 +568,11 @@
 </tr>
 <tr>
 <td>SAMPLE_SIZE</td>
-<td>2878657</td>
+<td>420000</td>
 </tr>
 <tr>
 <td>LAST_ANALYZED</td>
-<td>07/10/25</td>
+<td>28/10/25</td>
 </tr>
 <tr>
 <td>PARTITIONED</td>
@@ -736,7 +736,7 @@
 <td class="currentcell">NO</td>
 <td class="currentcell">null</td>
 <td class="currentcell">NO</td>
-<td class="currentcell">ITEM,&nbsp;PEDIDO,&nbsp;FIM,&nbsp;INICIO,&nbsp;TURMA,&nbsp;MAQUINA</td>
+<td class="currentcell">ID_ITEM,&nbsp;ID_PEDIDO,&nbsp;DT_FIM,&nbsp;DT_INICIO,&nbsp;TX_TURMA,&nbsp;ID_MAQUINA</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 8, 1)">
 <td>TRIMBOX_REFINED</td>
@@ -748,7 +748,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>TURMA</td>
+<td>TX_TURMA</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 8, 2)">
 <td>TRIMBOX_REFINED</td>
@@ -760,7 +760,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>MAQUINA</td>
+<td>ID_MAQUINA</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 8, 3)">
 <td>TRIMBOX_REFINED</td>
@@ -772,7 +772,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>USUARIO</td>
+<td>ID_USUARIO</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 8, 4)">
 <td>TRIMBOX_REFINED</td>
@@ -784,7 +784,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>FLAGPARADA</td>
+<td>FL_PARADA</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 8, 5)">
 <td>TRIMBOX_REFINED</td>
@@ -796,7 +796,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>CODIGOPARADAOUCONV</td>
+<td>CD_PARADAOUCONV</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 8, 6)">
 <td>TRIMBOX_REFINED</td>
@@ -808,7 +808,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>DESCORIGEMREGISTRO</td>
+<td>TX_DESCORIGEMREGISTRO</td>
 </tr>
 </table>
 <br/>
@@ -842,9 +842,9 @@
 <td class="currentcell">DBA_AJUSTE_01</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">TAREFCON</td>
-<td class="currentcell">FIM</td>
+<td class="currentcell">DT_FIM</td>
 <td class="currentcell">3</td>
-<td class="currentcell">7</td>
+<td class="currentcell">11</td>
 <td class="currentcell">0</td>
 <td class="currentcell">ASC</td>
 <td class="currentcell">null</td>
@@ -855,7 +855,7 @@
 <td>DBA_AJUSTE_01</td>
 <td>TRIMBOX_REFINED</td>
 <td>TAREFCON</td>
-<td>PEDIDO</td>
+<td>ID_PEDIDO</td>
 <td>2</td>
 <td>21</td>
 <td>21</td>
@@ -868,9 +868,9 @@
 <td>DBA_AJUSTE_01</td>
 <td>TRIMBOX_REFINED</td>
 <td>TAREFCON</td>
-<td>INICIO</td>
+<td>DT_INICIO</td>
 <td>4</td>
-<td>7</td>
+<td>11</td>
 <td>0</td>
 <td>ASC</td>
 <td>null</td>
@@ -881,7 +881,7 @@
 <td>DBA_AJUSTE_01</td>
 <td>TRIMBOX_REFINED</td>
 <td>TAREFCON</td>
-<td>TURMA</td>
+<td>TX_TURMA</td>
 <td>5</td>
 <td>5</td>
 <td>5</td>
@@ -894,7 +894,7 @@
 <td>DBA_AJUSTE_01</td>
 <td>TRIMBOX_REFINED</td>
 <td>TAREFCON</td>
-<td>MAQUINA</td>
+<td>ID_MAQUINA</td>
 <td>6</td>
 <td>50</td>
 <td>50</td>
@@ -907,7 +907,7 @@
 <td>DBA_AJUSTE_01</td>
 <td>TRIMBOX_REFINED</td>
 <td>TAREFCON</td>
-<td>ITEM</td>
+<td>ID_ITEM</td>
 <td>1</td>
 <td>20</td>
 <td>20</td>
@@ -938,7 +938,7 @@
 <td class="currentcell">IX_TURMA_TAREFCON</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">TAREFCON</td>
-<td class="currentcell">TURMA</td>
+<td class="currentcell">TX_TURMA</td>
 <td class="currentcell">1</td>
 <td class="currentcell">5</td>
 <td class="currentcell">5</td>
@@ -969,7 +969,7 @@
 <td class="currentcell">IX_MAQUINA_TAREFCON</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">TAREFCON</td>
-<td class="currentcell">MAQUINA</td>
+<td class="currentcell">ID_MAQUINA</td>
 <td class="currentcell">1</td>
 <td class="currentcell">50</td>
 <td class="currentcell">50</td>
@@ -1000,10 +1000,10 @@
 <td class="currentcell">IX_USUARIO_TAREFCON</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">TAREFCON</td>
-<td class="currentcell">USUARIO</td>
+<td class="currentcell">ID_USUARIO</td>
 <td class="currentcell">1</td>
-<td class="currentcell">22</td>
-<td class="currentcell">0</td>
+<td class="currentcell">20</td>
+<td class="currentcell">20</td>
 <td class="currentcell">ASC</td>
 <td class="currentcell">null</td>
 <td class="currentcell">null</td>
@@ -1031,10 +1031,10 @@
 <td class="currentcell">IX_FLAGPARADA_TAREFCON</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">TAREFCON</td>
-<td class="currentcell">FLAGPARADA</td>
+<td class="currentcell">FL_PARADA</td>
 <td class="currentcell">1</td>
-<td class="currentcell">22</td>
-<td class="currentcell">0</td>
+<td class="currentcell">1</td>
+<td class="currentcell">1</td>
 <td class="currentcell">ASC</td>
 <td class="currentcell">null</td>
 <td class="currentcell">null</td>
@@ -1062,10 +1062,10 @@
 <td class="currentcell">IX_CODIGOPARADAOUCONV_TAREFCON</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">TAREFCON</td>
-<td class="currentcell">CODIGOPARADAOUCONV</td>
+<td class="currentcell">CD_PARADAOUCONV</td>
 <td class="currentcell">1</td>
-<td class="currentcell">22</td>
-<td class="currentcell">0</td>
+<td class="currentcell">20</td>
+<td class="currentcell">20</td>
 <td class="currentcell">ASC</td>
 <td class="currentcell">null</td>
 <td class="currentcell">null</td>
@@ -1093,7 +1093,7 @@
 <td class="currentcell">IX_DESCORIGEMREGISTRO_TAREFCON</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">TAREFCON</td>
-<td class="currentcell">DESCORIGEMREGISTRO</td>
+<td class="currentcell">TX_DESCORIGEMREGISTRO</td>
 <td class="currentcell">1</td>
 <td class="currentcell">100</td>
 <td class="currentcell">100</td>
