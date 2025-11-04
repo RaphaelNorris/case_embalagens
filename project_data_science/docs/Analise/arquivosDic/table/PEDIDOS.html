@@ -70,7 +70,7 @@
 <th>COMMENTS</th>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 0)" class="currentrow">
-<td class="currentcell">PEDIDO</td>
+<td class="currentcell">ID_PEDIDO</td>
 <td class="currentcell">VARCHAR2(21&nbsp;BYTE)</td>
 <td class="currentcell">Yes</td>
 <td class="currentcell">null</td>
@@ -78,7 +78,7 @@
 <td class="currentcell">Identificador&nbsp;único&nbsp;do&nbsp;pedido</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 1)">
-<td>ITEM</td>
+<td>ID_ITEM</td>
 <td>VARCHAR2(20&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
@@ -86,47 +86,47 @@
 <td>Número&nbsp;sequencial&nbsp;do&nbsp;item&nbsp;dentro&nbsp;do&nbsp;pedido</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 2)">
-<td>STATUSPEDIDO</td>
-<td>NUMBER</td>
+<td>ST_PEDIDO</td>
+<td>VARCHAR2(20&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>3</td>
 <td>Código&nbsp;numérico&nbsp;representando&nbsp;o&nbsp;status&nbsp;atual&nbsp;do&nbsp;pedido&nbsp;-&nbsp;Considerar&nbsp;&lt;>4&nbsp;(Cancelado)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 3)">
-<td>DESCRSTATUSPEDIDO</td>
-<td>VARCHAR2(30&nbsp;BYTE)</td>
+<td>TX_DESCRSTATUSPEDIDO</td>
+<td>VARCHAR2(50&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>4</td>
 <td>Descrição&nbsp;textual&nbsp;do&nbsp;status&nbsp;do&nbsp;pedido&nbsp;(ex:&nbsp;Em&nbsp;produção,&nbsp;Concluído)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 4)">
-<td>SUSPENSO</td>
-<td>NUMBER(5,0)</td>
+<td>FL_SUSPENSO</td>
+<td>VARCHAR2(1&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>5</td>
 <td>Indicador&nbsp;de&nbsp;suspensão&nbsp;do&nbsp;pedido&nbsp;(1&nbsp;=&nbsp;suspenso)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 5)">
-<td>SUSPOUCANCEL</td>
-<td>VARCHAR2(10&nbsp;BYTE)</td>
+<td>TX_SUSPOUCANCEL</td>
+<td>VARCHAR2(5&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>6</td>
 <td>Indica&nbsp;se&nbsp;o&nbsp;pedido&nbsp;está&nbsp;suspenso&nbsp;ou&nbsp;cancelado</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 6)">
-<td>IDCLIENTE</td>
-<td>NUMBER</td>
+<td>ID_CLIENTE</td>
+<td>VARCHAR2(20&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>7</td>
 <td>Identificador&nbsp;do&nbsp;cliente&nbsp;associado&nbsp;ao&nbsp;pedido</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 7)">
-<td>REFERENCIA</td>
+<td>TX_REFERENCIA</td>
 <td>VARCHAR2(125&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
@@ -134,15 +134,15 @@
 <td>Referência&nbsp;comercial&nbsp;ou&nbsp;interna&nbsp;do&nbsp;produto&nbsp;solicitado</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 8)">
-<td>CODIGOREFERENCIA</td>
-<td>VARCHAR2(30&nbsp;BYTE)</td>
+<td>CD_REFERENCIA</td>
+<td>VARCHAR2(125&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>9</td>
 <td>Código&nbsp;secundário&nbsp;ou&nbsp;alternativo&nbsp;da&nbsp;referência&nbsp;do&nbsp;produto</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 9)">
-<td>TIPOABNT</td>
+<td>TX_TIPOABNT</td>
 <td>VARCHAR2(5&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
@@ -150,23 +150,23 @@
 <td>Código&nbsp;do&nbsp;tipo&nbsp;conforme&nbsp;norma&nbsp;ABNT&nbsp;aplicável</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 10)">
-<td>IDTIPOFT2</td>
-<td>NUMBER</td>
+<td>ID_TIPOFT2</td>
+<td>VARCHAR2(20&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>11</td>
 <td>Identificador&nbsp;do&nbsp;tipo&nbsp;FT2&nbsp;associado&nbsp;-&nbsp;&nbsp;=2&nbsp;identifica&nbsp;neces.&nbsp;de&nbsp;Cont.&nbsp;de&nbsp;Impressão</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 11)">
-<td>EXIGELAUDO</td>
-<td>NUMBER(5,0)</td>
+<td>FL_EXIGELAUDO</td>
+<td>VARCHAR2(1&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>12</td>
 <td>Indica&nbsp;se&nbsp;o&nbsp;pedido&nbsp;exige&nbsp;laudo&nbsp;técnico&nbsp;(1&nbsp;=&nbsp;sim)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 12)">
-<td>GRAMATURA</td>
+<td>VL_GRAMATURA</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -174,39 +174,39 @@
 <td>Gramatura&nbsp;do&nbsp;material&nbsp;(peso&nbsp;em&nbsp;g/m²)&nbsp;-&nbsp;Teste&nbsp;físico&nbsp;solic.&nbsp;pelo&nbsp;cliente</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 13)">
-<td>COLUNAMINIMO</td>
-<td>BINARY_DOUBLE</td>
+<td>VL_COLUNAMINIMO</td>
+<td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
 <td>14</td>
 <td>Valor&nbsp;mínimo&nbsp;de&nbsp;coluna&nbsp;permitida&nbsp;na&nbsp;estrutura&nbsp;do&nbsp;pedido&nbsp;-&nbsp;Teste&nbsp;físico&nbsp;solic.&nbsp;pelo&nbsp;cliente</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 14)">
-<td>COBBINTMAXIMO</td>
-<td>BINARY_DOUBLE</td>
+<td>QT_COBBINTMAXIMO</td>
+<td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
 <td>15</td>
 <td>Valor&nbsp;máximo&nbsp;de&nbsp;absorção&nbsp;Cobb&nbsp;interna&nbsp;permitida</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 15)">
-<td>COMPRESSAO</td>
-<td>BINARY_DOUBLE</td>
+<td>VL_COMPRESSAO</td>
+<td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
 <td>16</td>
 <td>Nível&nbsp;de&nbsp;compressão&nbsp;do&nbsp;material&nbsp;(força&nbsp;suportada)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 16)">
-<td>CHAPA</td>
-<td>NUMBER(5,0)</td>
+<td>FL_CHAPA</td>
+<td>VARCHAR2(1&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>17</td>
 <td>Tipo&nbsp;de&nbsp;chapa&nbsp;utilizada&nbsp;na&nbsp;produção&nbsp;-&nbsp;=0&nbsp;chapa&nbsp;/&nbsp;=1&nbsp;caixa</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 17)">
-<td>COMPOSICAO</td>
+<td>TX_COMPOSICAO</td>
 <td>VARCHAR2(40&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
@@ -214,7 +214,7 @@
 <td>Descrição&nbsp;da&nbsp;composição&nbsp;do&nbsp;material&nbsp;(ex:&nbsp;reciclado,&nbsp;kraft)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 18)">
-<td>LARGURA</td>
+<td>VL_LARGURA</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -222,7 +222,7 @@
 <td>Largura&nbsp;total&nbsp;do&nbsp;produto&nbsp;acabado</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 19)">
-<td>REFILOLARGURA</td>
+<td>VL_REFILOLARGURA</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -230,7 +230,7 @@
 <td>Largura&nbsp;referente&nbsp;ao&nbsp;refilo&nbsp;do&nbsp;produto</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 20)">
-<td>COMPRIMENTO</td>
+<td>VL_COMPRIMENTO</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -238,7 +238,7 @@
 <td>Comprimento&nbsp;total&nbsp;do&nbsp;produto&nbsp;acabado</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 21)">
-<td>REFILOCOMPRIMENTO</td>
+<td>VL_REFILOCOMPRIMENTO</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -246,7 +246,7 @@
 <td>Comprimento&nbsp;referente&nbsp;ao&nbsp;refilo&nbsp;do&nbsp;produto</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 22)">
-<td>MULTLARG</td>
+<td>VL_MULTLARG</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -254,7 +254,7 @@
 <td>Multiplicador&nbsp;de&nbsp;largura&nbsp;para&nbsp;cálculo&nbsp;de&nbsp;otimização</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 23)">
-<td>MULTCOMP</td>
+<td>VL_MULTCOMP</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -262,7 +262,7 @@
 <td>Multiplicador&nbsp;de&nbsp;comprimento&nbsp;para&nbsp;cálculo&nbsp;de&nbsp;otimização</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 24)">
-<td>ARRANJO</td>
+<td>QT_ARRANJO</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -270,15 +270,15 @@
 <td>Número&nbsp;do&nbsp;arranjo&nbsp;produtivo&nbsp;ou&nbsp;configuração&nbsp;do&nbsp;pedido</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 25)">
-<td>REFUGOCLIENTE</td>
-<td>BINARY_DOUBLE</td>
+<td>VL_REFUGOCLIENTE</td>
+<td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
 <td>26</td>
 <td>Percentual&nbsp;de&nbsp;refugo&nbsp;atribuído&nbsp;ao&nbsp;cliente</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 26)">
-<td>PESOPECA</td>
+<td>VL_PESOPECA</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -286,7 +286,7 @@
 <td>Peso&nbsp;de&nbsp;cada&nbsp;peça&nbsp;individual&nbsp;(kg&nbsp;ou&nbsp;g)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 27)">
-<td>VINCOLARG1</td>
+<td>VL_VINCOLARG1</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -294,7 +294,7 @@
 <td>Posição&nbsp;do&nbsp;primeiro&nbsp;vinco&nbsp;na&nbsp;largura</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 28)">
-<td>VINCOLARG2</td>
+<td>VL_VINCOLARG2</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -302,7 +302,7 @@
 <td>Posição&nbsp;do&nbsp;segundo&nbsp;vinco&nbsp;na&nbsp;largura</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 29)">
-<td>VINCOLARG3</td>
+<td>VL_VINCOLARG3</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -310,7 +310,7 @@
 <td>Posição&nbsp;do&nbsp;terceiro&nbsp;vinco&nbsp;na&nbsp;largura</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 30)">
-<td>VINCOCOMP1</td>
+<td>VL_VINCOCOMP1</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -318,7 +318,7 @@
 <td>Posição&nbsp;do&nbsp;primeiro&nbsp;vinco&nbsp;no&nbsp;comprimento</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 31)">
-<td>VINCOCOMP2</td>
+<td>VL_VINCOCOMP2</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -326,7 +326,7 @@
 <td>Posição&nbsp;do&nbsp;segundo&nbsp;vinco&nbsp;no&nbsp;comprimento</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 32)">
-<td>VINCOCOMP3</td>
+<td>VL_VINCOCOMP3</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -334,7 +334,7 @@
 <td>Posição&nbsp;do&nbsp;terceiro&nbsp;vinco&nbsp;no&nbsp;comprimento</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 33)">
-<td>VINCOCOMP4</td>
+<td>VL_VINCOCOMP4</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -342,7 +342,7 @@
 <td>Posição&nbsp;do&nbsp;quarto&nbsp;vinco&nbsp;no&nbsp;comprimento</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 34)">
-<td>VINCOCOMP5</td>
+<td>VL_VINCOCOMP5</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -350,7 +350,7 @@
 <td>Posição&nbsp;do&nbsp;quinto&nbsp;vinco&nbsp;no&nbsp;comprimento</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 35)">
-<td>LAP</td>
+<td>QT_LAP</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -358,7 +358,7 @@
 <td>Tamanho&nbsp;da&nbsp;aba&nbsp;de&nbsp;colagem&nbsp;(lap)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 36)">
-<td>PROLONGLAP</td>
+<td>QT_PROLONGLAP</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -366,55 +366,55 @@
 <td>Prolongamento&nbsp;da&nbsp;aba&nbsp;de&nbsp;colagem</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 37)">
-<td>LAPNOCOMP</td>
-<td>NUMBER(5,0)</td>
+<td>CD_LAPNOCOMP</td>
+<td>VARCHAR2(20&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>38</td>
 <td>Indica&nbsp;lap&nbsp;no&nbsp;comprimento&nbsp;(1&nbsp;=&nbsp;sim)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 38)">
-<td>LAPINTERNO</td>
-<td>NUMBER(5,0)</td>
+<td>CD_LAPINTERNO</td>
+<td>VARCHAR2(20&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>39</td>
 <td>Indica&nbsp;se&nbsp;o&nbsp;lap&nbsp;é&nbsp;interno</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 39)">
-<td>REFILADO</td>
-<td>NUMBER(5,0)</td>
+<td>FL_REFILADO</td>
+<td>VARCHAR2(1&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>40</td>
 <td>Indica&nbsp;se&nbsp;o&nbsp;produto&nbsp;passou&nbsp;por&nbsp;refilagem</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 40)">
-<td>RESINAINTERNA</td>
-<td>NUMBER</td>
+<td>FL_RESINAINTERNA</td>
+<td>VARCHAR2(1&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>41</td>
 <td>Indica&nbsp;presença&nbsp;de&nbsp;resina&nbsp;interna&nbsp;no&nbsp;material</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 41)">
-<td>AMARRADO</td>
-<td>NUMBER(5,0)</td>
+<td>FL_AMARRADO</td>
+<td>VARCHAR2(1&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>42</td>
 <td>Indica&nbsp;se&nbsp;o&nbsp;produto&nbsp;é&nbsp;amarrado&nbsp;(1&nbsp;=&nbsp;sim)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 42)">
-<td>PALETIZADO</td>
-<td>NUMBER(5,0)</td>
+<td>FL_PALETIZADO</td>
+<td>VARCHAR2(1&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>43</td>
 <td>Indica&nbsp;se&nbsp;o&nbsp;produto&nbsp;é&nbsp;paletizado&nbsp;(1&nbsp;=&nbsp;sim)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 43)">
-<td>PACOTESLARGURA</td>
+<td>VL_PACOTESLARGURA</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -422,7 +422,7 @@
 <td>Largura&nbsp;dos&nbsp;pacotes&nbsp;produzidos</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 44)">
-<td>PACOTESCOMPRIMENTO</td>
+<td>VL_PACOTESCOMPRIMENTO</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -430,7 +430,7 @@
 <td>Comprimento&nbsp;dos&nbsp;pacotes&nbsp;produzidos</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 45)">
-<td>PACOTESALTURA</td>
+<td>VL_PACOTESALTURA</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -438,7 +438,7 @@
 <td>Altura&nbsp;dos&nbsp;pacotes&nbsp;produzidos</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 46)">
-<td>PECASPORPACOTE</td>
+<td>QT_PECASPORPACOTE</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -446,7 +446,7 @@
 <td>Quantidade&nbsp;de&nbsp;peças&nbsp;por&nbsp;pacote</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 47)">
-<td>PECASPORPALETE</td>
+<td>QT_PECASPORPALETE</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -454,15 +454,15 @@
 <td>Quantidade&nbsp;de&nbsp;peças&nbsp;por&nbsp;palete</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 48)">
-<td>UNIDADESPORPALETE</td>
-<td>BINARY_DOUBLE</td>
+<td>QT_UNIDADESPORPALETE</td>
+<td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
 <td>49</td>
 <td>Unidades&nbsp;totais&nbsp;por&nbsp;palete</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 49)">
-<td>PACOTESPORPALETE</td>
+<td>QT_PACOTESPORPALETE</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -470,23 +470,23 @@
 <td>Quantidade&nbsp;de&nbsp;pacotes&nbsp;por&nbsp;palete</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 50)">
-<td>ESPELHO</td>
-<td>NUMBER</td>
+<td>CD_ESPELHO</td>
+<td>VARCHAR2(20&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>51</td>
 <td>Indica&nbsp;se&nbsp;o&nbsp;layout&nbsp;possui&nbsp;espelhamento&nbsp;(1&nbsp;=&nbsp;sim)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 51)">
-<td>FILME</td>
-<td>NUMBER(5,0)</td>
+<td>CD_FILME</td>
+<td>VARCHAR2(20&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>52</td>
 <td>Indica&nbsp;se&nbsp;o&nbsp;palete&nbsp;possui&nbsp;filme&nbsp;plástico&nbsp;(1&nbsp;=&nbsp;sim)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 52)">
-<td>FACA</td>
+<td>CD_FACA</td>
 <td>VARCHAR2(30&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
@@ -494,15 +494,15 @@
 <td>Código&nbsp;ou&nbsp;nome&nbsp;da&nbsp;faca&nbsp;utilizada&nbsp;na&nbsp;produção</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 53)">
-<td>COR1</td>
-<td>VARCHAR2(15&nbsp;BYTE)</td>
+<td>TX_COR1</td>
+<td>VARCHAR2(40&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>54</td>
 <td>Primeira&nbsp;cor&nbsp;utilizada&nbsp;na&nbsp;impressão</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 54)">
-<td>CONSUMOCOR1</td>
+<td>VL_CONSUMOCOR1</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -510,15 +510,15 @@
 <td>Consumo&nbsp;da&nbsp;primeira&nbsp;cor&nbsp;(ml&nbsp;ou&nbsp;g)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 55)">
-<td>COR2</td>
-<td>VARCHAR2(15&nbsp;BYTE)</td>
+<td>TX_COR2</td>
+<td>VARCHAR2(40&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>56</td>
 <td>Segunda&nbsp;cor&nbsp;utilizada&nbsp;na&nbsp;impressão</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 56)">
-<td>CONSUMOCOR2</td>
+<td>VL_CONSUMOCOR2</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -526,15 +526,15 @@
 <td>Consumo&nbsp;da&nbsp;segunda&nbsp;cor</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 57)">
-<td>COR3</td>
-<td>VARCHAR2(15&nbsp;BYTE)</td>
+<td>TX_COR3</td>
+<td>VARCHAR2(40&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>58</td>
 <td>Terceira&nbsp;cor&nbsp;utilizada&nbsp;na&nbsp;impressão</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 58)">
-<td>CONSUMOCOR3</td>
+<td>VL_CONSUMOCOR3</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -542,15 +542,15 @@
 <td>Consumo&nbsp;da&nbsp;terceira&nbsp;cor</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 59)">
-<td>COR4</td>
-<td>VARCHAR2(15&nbsp;BYTE)</td>
+<td>TX_COR4</td>
+<td>VARCHAR2(40&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>60</td>
 <td>Quarta&nbsp;cor&nbsp;utilizada&nbsp;na&nbsp;impressão</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 60)">
-<td>CONSUMOCOR4</td>
+<td>VL_CONSUMOCOR4</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -558,7 +558,7 @@
 <td>Consumo&nbsp;da&nbsp;quarta&nbsp;cor</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 61)">
-<td>NRCORES</td>
+<td>QT_NRCORES</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -566,15 +566,15 @@
 <td>Número&nbsp;total&nbsp;de&nbsp;cores&nbsp;utilizadas&nbsp;na&nbsp;impressão</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 62)">
-<td>DATAENTREGA2</td>
-<td>DATE</td>
+<td>DT_ENTREGA2</td>
+<td>TIMESTAMP(6)</td>
 <td>Yes</td>
 <td>null</td>
 <td>63</td>
 <td>Data&nbsp;de&nbsp;entrega&nbsp;planejada&nbsp;(reprogramada)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 63)">
-<td>QUANTIDADEPEDIDA</td>
+<td>QT_PEDIDA</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -582,7 +582,7 @@
 <td>Quantidade&nbsp;total&nbsp;pedida</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 64)">
-<td>QUANTIDADEPEDIDAMIN</td>
+<td>QT_PEDIDAMIN</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -590,7 +590,7 @@
 <td>Quantidade&nbsp;mínima&nbsp;pedida</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 65)">
-<td>QUANTIDADEPEDIDAMAX</td>
+<td>QT_PEDIDAMAX</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -598,23 +598,23 @@
 <td>Quantidade&nbsp;máxima&nbsp;pedida</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 66)">
-<td>TIPOENTREGA</td>
-<td>NUMBER</td>
+<td>FL_TIPOENTREGA</td>
+<td>VARCHAR2(1&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>67</td>
 <td>Código&nbsp;do&nbsp;tipo&nbsp;de&nbsp;entrega&nbsp;(ex:&nbsp;parcial,&nbsp;total)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 67)">
-<td>DESCTIPOENTREGA</td>
-<td>VARCHAR2(10&nbsp;BYTE)</td>
+<td>TX_DESCTIPOENTREGA</td>
+<td>VARCHAR2(100&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>68</td>
 <td>Descrição&nbsp;textual&nbsp;do&nbsp;tipo&nbsp;de&nbsp;entrega</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 68)">
-<td>LARGURAINTERNA</td>
+<td>VL_LARGURAINTERNA</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -622,7 +622,7 @@
 <td>Largura&nbsp;interna&nbsp;do&nbsp;produto&nbsp;montado</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 69)">
-<td>COMPRIMENTOINTERNO</td>
+<td>VL_COMPRIMENTOINTERNO</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -630,7 +630,7 @@
 <td>Comprimento&nbsp;interno&nbsp;do&nbsp;produto&nbsp;montado</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 70)">
-<td>ALTURAINTERNA</td>
+<td>VL_ALTURAINTERNA</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -638,7 +638,7 @@
 <td>Altura&nbsp;interna&nbsp;do&nbsp;produto&nbsp;montado</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 71)">
-<td>LARGPECA</td>
+<td>VL_LARGPECA</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -646,7 +646,7 @@
 <td>Largura&nbsp;de&nbsp;cada&nbsp;peça&nbsp;individual</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 72)">
-<td>COMPPECA</td>
+<td>VL_COMPPECA</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -654,23 +654,23 @@
 <td>Comprimento&nbsp;de&nbsp;cada&nbsp;peça&nbsp;individual</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 73)">
-<td>DATAENTREGAORIGINAL</td>
-<td>DATE</td>
+<td>DT_ENTREGAORIGINAL</td>
+<td>TIMESTAMP(6)</td>
 <td>Yes</td>
 <td>null</td>
 <td>74</td>
 <td>Data&nbsp;original&nbsp;de&nbsp;entrega&nbsp;informada&nbsp;no&nbsp;pedido</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 74)">
-<td>DESCRTIPODOPEDIDO</td>
-<td>VARCHAR2(30&nbsp;BYTE)</td>
+<td>TX_DESCRTIPODOPEDIDO</td>
+<td>VARCHAR2(100&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>75</td>
 <td>Descrição&nbsp;do&nbsp;tipo&nbsp;do&nbsp;pedido&nbsp;(ex:&nbsp;Venda,&nbsp;Amostra,&nbsp;Reposição)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 75)">
-<td>COMPPACOTE</td>
+<td>VL_COMPPACOTE</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -678,7 +678,7 @@
 <td>Comprimento&nbsp;total&nbsp;do&nbsp;pacote</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 76)">
-<td>LARGPACOTE</td>
+<td>VL_LARGPACOTE</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -686,7 +686,7 @@
 <td>Largura&nbsp;total&nbsp;do&nbsp;pacote</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 77)">
-<td>ALTURAPACOTE</td>
+<td>VL_ALTURAPACOTE</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -694,7 +694,7 @@
 <td>Altura&nbsp;total&nbsp;do&nbsp;pacote</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 78)">
-<td>COMPPALETEFECHADO</td>
+<td>VL_COMPPALETEFECHADO</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -702,7 +702,7 @@
 <td>Comprimento&nbsp;do&nbsp;palete&nbsp;fechado</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 79)">
-<td>LARGPALETEFECHADO</td>
+<td>VL_LARGPALETEFECHADO</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -710,7 +710,7 @@
 <td>Largura&nbsp;do&nbsp;palete&nbsp;fechado</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 80)">
-<td>ALTURAPALETEFECHADO</td>
+<td>VL_ALTURAPALETEFECHADO</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -718,15 +718,15 @@
 <td>Altura&nbsp;do&nbsp;palete&nbsp;fechado</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 81)">
-<td>PESOCAIXA</td>
-<td>BINARY_DOUBLE</td>
+<td>VL_PESOCAIXA</td>
+<td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
 <td>82</td>
 <td>Peso&nbsp;bruto&nbsp;da&nbsp;caixa&nbsp;de&nbsp;transporte</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 82)">
-<td>PATHFIGURADOLASTRO</td>
+<td>TX_PATHFIGURADOLASTRO</td>
 <td>VARCHAR2(255&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
@@ -734,72 +734,72 @@
 <td>Caminho&nbsp;do&nbsp;arquivo&nbsp;de&nbsp;imagem&nbsp;associado&nbsp;ao&nbsp;lastro</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 83)">
-<td>IDPALETE</td>
-<td>NUMBER</td>
+<td>ID_PALETE</td>
+<td>VARCHAR2(20&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>84</td>
 <td>Identificador&nbsp;do&nbsp;tipo&nbsp;de&nbsp;palete&nbsp;utilizado</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 84)">
-<td>AREABRUTAPECACOMREFILOS</td>
-<td>BINARY_DOUBLE</td>
+<td>VL_AREABRUTAPECACOMREFILOS</td>
+<td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
 <td>85</td>
 <td>Área&nbsp;bruta&nbsp;da&nbsp;peça&nbsp;considerando&nbsp;refilos&nbsp;(unidade:&nbsp;cm2&nbsp;ou&nbsp;mm2&nbsp;conforme&nbsp;padrão&nbsp;da&nbsp;base)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 85)">
-<td>AREABRUTAPECA</td>
-<td>BINARY_DOUBLE</td>
+<td>VL_AREABRUTAPECA</td>
+<td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
 <td>86</td>
 <td>Área&nbsp;bruta&nbsp;da&nbsp;peça&nbsp;sem&nbsp;considerar&nbsp;refilos&nbsp;(unidade:&nbsp;cm2&nbsp;ou&nbsp;mm2)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 86)">
-<td>AREALIQUIDAPECA</td>
-<td>BINARY_DOUBLE</td>
+<td>VL_AREALIQUIDAPECA</td>
+<td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
 <td>87</td>
 <td>Área&nbsp;líquida&nbsp;útil&nbsp;da&nbsp;peça&nbsp;após&nbsp;cortes/refilagens&nbsp;(unidade:&nbsp;cm2&nbsp;ou&nbsp;mm2)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 87)">
-<td>AREABRUTACHAPA</td>
-<td>BINARY_DOUBLE</td>
+<td>VL_AREABRUTACHAPA</td>
+<td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
 <td>88</td>
 <td>Área&nbsp;bruta&nbsp;total&nbsp;da&nbsp;chapa&nbsp;antes&nbsp;do&nbsp;corte&nbsp;(unidade:&nbsp;cm2&nbsp;ou&nbsp;mm2)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 88)">
-<td>AREALIQUIDACHAPA</td>
-<td>BINARY_DOUBLE</td>
+<td>VL_AREALIQUIDACHAPA</td>
+<td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
 <td>89</td>
 <td>Área&nbsp;líquida&nbsp;aproveitável&nbsp;da&nbsp;chapa&nbsp;após&nbsp;posicionamento&nbsp;das&nbsp;peças&nbsp;(unidade:&nbsp;cm2&nbsp;ou&nbsp;mm2)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 89)">
-<td>VOLUMEPALETEFECHADOM3</td>
-<td>BINARY_DOUBLE</td>
+<td>VL_VOLUMEPALETEFECHADOM3</td>
+<td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
 <td>90</td>
 <td>Volume&nbsp;do&nbsp;palete&nbsp;fechado&nbsp;em&nbsp;metros&nbsp;cúbicos&nbsp;(m³)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 90)">
-<td>VOLUMEPACOTEFECHADOM3</td>
-<td>BINARY_DOUBLE</td>
+<td>VL_VOLUMEPACOTEFECHADOM3</td>
+<td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
 <td>91</td>
 <td>Volume&nbsp;do&nbsp;pacote&nbsp;fechado&nbsp;em&nbsp;metros&nbsp;cúbicos&nbsp;(m³)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 91)">
-<td>VOLUMEFECHADOPEDIDO</td>
-<td>BINARY_DOUBLE</td>
+<td>VL_VOLUMEFECHADOPEDIDO</td>
+<td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
 <td>92</td>
@@ -867,27 +867,27 @@
 </tr>
 <tr>
 <td>NUM_ROWS</td>
-<td>1958278</td>
+<td>1621206</td>
 </tr>
 <tr>
 <td>BLOCKS</td>
-<td>111077</td>
+<td>80477</td>
 </tr>
 <tr>
 <td>AVG_ROW_LEN</td>
-<td>385</td>
+<td>354</td>
 </tr>
 <tr>
 <td>SAMPLE_SIZE</td>
-<td>1958278</td>
+<td>1621206</td>
 </tr>
 <tr>
 <td>LAST_ANALYZED</td>
-<td>15/10/25</td>
+<td>30/10/25</td>
 </tr>
 <tr>
 <td>LAST_ANALYZED_SINCE</td>
-<td>15/10/25</td>
+<td>30/10/25</td>
 </tr>
 </table>
 <br/>
@@ -968,7 +968,7 @@
 </tr>
 <tr>
 <td>LAST_DDL_TIME</td>
-<td>15/10/25</td>
+<td>30/10/25</td>
 </tr>
 <tr>
 <td>OWNER</td>
@@ -1048,11 +1048,11 @@
 </tr>
 <tr>
 <td>NUM_ROWS</td>
-<td>1958278</td>
+<td>1621206</td>
 </tr>
 <tr>
 <td>BLOCKS</td>
-<td>111077</td>
+<td>80477</td>
 </tr>
 <tr>
 <td>EMPTY_BLOCKS</td>
@@ -1068,7 +1068,7 @@
 </tr>
 <tr>
 <td>AVG_ROW_LEN</td>
-<td>385</td>
+<td>354</td>
 </tr>
 <tr>
 <td>AVG_SPACE_FREELIST_BLOCKS</td>
@@ -1096,11 +1096,11 @@
 </tr>
 <tr>
 <td>SAMPLE_SIZE</td>
-<td>1958278</td>
+<td>1621206</td>
 </tr>
 <tr>
 <td>LAST_ANALYZED</td>
-<td>15/10/25</td>
+<td>30/10/25</td>
 </tr>
 <tr>
 <td>PARTITIONED</td>
@@ -1264,7 +1264,7 @@
 <td class="currentcell">NO</td>
 <td class="currentcell">null</td>
 <td class="currentcell">NO</td>
-<td class="currentcell">COR1</td>
+<td class="currentcell">TX_COR1</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 8, 1)">
 <td>TRIMBOX_REFINED</td>
@@ -1276,7 +1276,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>COR2</td>
+<td>TX_COR2</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 8, 2)">
 <td>TRIMBOX_REFINED</td>
@@ -1288,7 +1288,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>COR3</td>
+<td>TX_COR3</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 8, 3)">
 <td>TRIMBOX_REFINED</td>
@@ -1300,7 +1300,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>COR4</td>
+<td>TX_COR4</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 8, 4)">
 <td>TRIMBOX_REFINED</td>
@@ -1312,7 +1312,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>FACA</td>
+<td>CD_FACA</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 8, 5)">
 <td>TRIMBOX_REFINED</td>
@@ -1324,7 +1324,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>ITEM</td>
+<td>ID_ITEM</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 8, 6)">
 <td>TRIMBOX_REFINED</td>
@@ -1336,7 +1336,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>PEDIDO</td>
+<td>ID_PEDIDO</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 8, 7)">
 <td>TRIMBOX_REFINED</td>
@@ -1348,7 +1348,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>GRAMATURA</td>
+<td>VL_GRAMATURA</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 8, 8)">
 <td>TRIMBOX_REFINED</td>
@@ -1360,7 +1360,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>COMPOSICAO</td>
+<td>TX_COMPOSICAO</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 8, 9)">
 <td>TRIMBOX_REFINED</td>
@@ -1372,7 +1372,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>REFERENCIA</td>
+<td>TX_REFERENCIA</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 8, 10)">
 <td>TRIMBOX_REFINED</td>
@@ -1384,7 +1384,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>CODIGOREFERENCIA</td>
+<td>CD_REFERENCIA</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 8, 11)">
 <td>TRIMBOX_REFINED</td>
@@ -1396,7 +1396,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>DESCRSTATUSPEDIDO</td>
+<td>TX_DESCRSTATUSPEDIDO</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 8, 12)">
 <td>TRIMBOX_REFINED</td>
@@ -1408,7 +1408,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>DESCRTIPODOPEDIDO</td>
+<td>TX_DESCRTIPODOPEDIDO</td>
 </tr>
 </table>
 <br/>
@@ -1442,10 +1442,10 @@
 <td class="currentcell">IX_COR1_PEDIDOS</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">PEDIDOS</td>
-<td class="currentcell">COR1</td>
+<td class="currentcell">TX_COR1</td>
 <td class="currentcell">1</td>
-<td class="currentcell">15</td>
-<td class="currentcell">15</td>
+<td class="currentcell">40</td>
+<td class="currentcell">40</td>
 <td class="currentcell">ASC</td>
 <td class="currentcell">null</td>
 <td class="currentcell">null</td>
@@ -1473,10 +1473,10 @@
 <td class="currentcell">IX_COR2_PEDIDOS</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">PEDIDOS</td>
-<td class="currentcell">COR2</td>
+<td class="currentcell">TX_COR2</td>
 <td class="currentcell">1</td>
-<td class="currentcell">15</td>
-<td class="currentcell">15</td>
+<td class="currentcell">40</td>
+<td class="currentcell">40</td>
 <td class="currentcell">ASC</td>
 <td class="currentcell">null</td>
 <td class="currentcell">null</td>
@@ -1504,10 +1504,10 @@
 <td class="currentcell">IX_COR3_PEDIDOS</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">PEDIDOS</td>
-<td class="currentcell">COR3</td>
+<td class="currentcell">TX_COR3</td>
 <td class="currentcell">1</td>
-<td class="currentcell">15</td>
-<td class="currentcell">15</td>
+<td class="currentcell">40</td>
+<td class="currentcell">40</td>
 <td class="currentcell">ASC</td>
 <td class="currentcell">null</td>
 <td class="currentcell">null</td>
@@ -1535,10 +1535,10 @@
 <td class="currentcell">IX_COR4_PEDIDOS</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">PEDIDOS</td>
-<td class="currentcell">COR4</td>
+<td class="currentcell">TX_COR4</td>
 <td class="currentcell">1</td>
-<td class="currentcell">15</td>
-<td class="currentcell">15</td>
+<td class="currentcell">40</td>
+<td class="currentcell">40</td>
 <td class="currentcell">ASC</td>
 <td class="currentcell">null</td>
 <td class="currentcell">null</td>
@@ -1566,7 +1566,7 @@
 <td class="currentcell">IX_FACA_PEDIDOS</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">PEDIDOS</td>
-<td class="currentcell">FACA</td>
+<td class="currentcell">CD_FACA</td>
 <td class="currentcell">1</td>
 <td class="currentcell">30</td>
 <td class="currentcell">30</td>
@@ -1597,7 +1597,7 @@
 <td class="currentcell">IX_ITEM_PEDIDOS</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">PEDIDOS</td>
-<td class="currentcell">ITEM</td>
+<td class="currentcell">ID_ITEM</td>
 <td class="currentcell">1</td>
 <td class="currentcell">20</td>
 <td class="currentcell">20</td>
@@ -1628,7 +1628,7 @@
 <td class="currentcell">IX_PEDIDO_PEDIDOS</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">PEDIDOS</td>
-<td class="currentcell">PEDIDO</td>
+<td class="currentcell">ID_PEDIDO</td>
 <td class="currentcell">1</td>
 <td class="currentcell">21</td>
 <td class="currentcell">21</td>
@@ -1659,7 +1659,7 @@
 <td class="currentcell">IX_GRAMATURA_PEDIDOS</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">PEDIDOS</td>
-<td class="currentcell">GRAMATURA</td>
+<td class="currentcell">VL_GRAMATURA</td>
 <td class="currentcell">1</td>
 <td class="currentcell">22</td>
 <td class="currentcell">0</td>
@@ -1690,7 +1690,7 @@
 <td class="currentcell">IX_COMPOSICAO_PEDIDOS</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">PEDIDOS</td>
-<td class="currentcell">COMPOSICAO</td>
+<td class="currentcell">TX_COMPOSICAO</td>
 <td class="currentcell">1</td>
 <td class="currentcell">40</td>
 <td class="currentcell">40</td>
@@ -1721,7 +1721,7 @@
 <td class="currentcell">IX_REFERENCIA_PEDIDOS</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">PEDIDOS</td>
-<td class="currentcell">REFERENCIA</td>
+<td class="currentcell">TX_REFERENCIA</td>
 <td class="currentcell">1</td>
 <td class="currentcell">125</td>
 <td class="currentcell">125</td>
@@ -1752,10 +1752,10 @@
 <td class="currentcell">IX_CODIGOREFERENCIA_PEDIDOS</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">PEDIDOS</td>
-<td class="currentcell">CODIGOREFERENCIA</td>
+<td class="currentcell">CD_REFERENCIA</td>
 <td class="currentcell">1</td>
-<td class="currentcell">30</td>
-<td class="currentcell">30</td>
+<td class="currentcell">125</td>
+<td class="currentcell">125</td>
 <td class="currentcell">ASC</td>
 <td class="currentcell">null</td>
 <td class="currentcell">null</td>
@@ -1783,10 +1783,10 @@
 <td class="currentcell">IX_DESCRSTATUSPEDIDO_PEDIDOS</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">PEDIDOS</td>
-<td class="currentcell">DESCRSTATUSPEDIDO</td>
+<td class="currentcell">TX_DESCRSTATUSPEDIDO</td>
 <td class="currentcell">1</td>
-<td class="currentcell">30</td>
-<td class="currentcell">30</td>
+<td class="currentcell">50</td>
+<td class="currentcell">50</td>
 <td class="currentcell">ASC</td>
 <td class="currentcell">null</td>
 <td class="currentcell">null</td>
@@ -1814,10 +1814,10 @@
 <td class="currentcell">IX_DESCRTIPODOPEDIDO_PEDIDOS</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">PEDIDOS</td>
-<td class="currentcell">DESCRTIPODOPEDIDO</td>
+<td class="currentcell">TX_DESCRTIPODOPEDIDO</td>
 <td class="currentcell">1</td>
-<td class="currentcell">30</td>
-<td class="currentcell">30</td>
+<td class="currentcell">100</td>
+<td class="currentcell">100</td>
 <td class="currentcell">ASC</td>
 <td class="currentcell">null</td>
 <td class="currentcell">null</td>

@@ -70,41 +70,41 @@
 <th>COMMENTS</th>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 0)" class="currentrow">
-<td class="currentcell">PARADA</td>
-<td class="currentcell">NUMBER</td>
+<td class="currentcell">ID_PARADA</td>
+<td class="currentcell">VARCHAR2(20&nbsp;BYTE)</td>
 <td class="currentcell">No</td>
 <td class="currentcell">null</td>
 <td class="currentcell">1</td>
 <td class="currentcell">ID&nbsp;de&nbsp;sequencial&nbsp;de&nbsp;parada</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 1)">
-<td>DESCRICAO</td>
-<td>VARCHAR2(30&nbsp;BYTE)</td>
+<td>TX_DESCRICAO</td>
+<td>VARCHAR2(125&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>2</td>
 <td>Descricao&nbsp;da&nbsp;parada&nbsp;realizada</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 2)">
-<td>USADACONVERSAO</td>
-<td>CHAR(1&nbsp;BYTE)</td>
-<td>No</td>
+<td>FL_USADACONVERSAO</td>
+<td>VARCHAR2(1&nbsp;BYTE)</td>
+<td>Yes</td>
 <td>null</td>
 <td>3</td>
 <td>Identificao&nbsp;se&nbsp;usada&nbsp;para&nbsp;conversao</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 3)">
-<td>DESATIVADA</td>
-<td>CHAR(1&nbsp;BYTE)</td>
-<td>No</td>
+<td>FL_DESATIVADA</td>
+<td>VARCHAR2(1&nbsp;BYTE)</td>
+<td>Yes</td>
 <td>null</td>
 <td>4</td>
 <td>Identificacao&nbsp;se&nbsp;foi&nbsp;desativada&nbsp;ou&nbsp;nao</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 4)">
-<td>FLAGEXTERNA</td>
-<td>CHAR(1&nbsp;BYTE)</td>
-<td>No</td>
+<td>FL_EXTERNA</td>
+<td>VARCHAR2(1&nbsp;BYTE)</td>
+<td>Yes</td>
 <td>null</td>
 <td>5</td>
 <td>Existe&nbsp;Flag&nbsp;externa</td>
@@ -155,86 +155,6 @@
 <td class="currentcell">null</td>
 <td class="currentcell">null</td>
 </tr>
-<tr onclick="table_onSelectMasterRow(this, 1, 1)">
-<td>SYS_C0016606728</td>
-<td>Check</td>
-<td>"PARADA"&nbsp;IS&nbsp;NOT&nbsp;NULL</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-<td>ENABLED</td>
-<td>NOT&nbsp;DEFERRABLE</td>
-<td>VALIDATED</td>
-<td>GENERATED&nbsp;NAME</td>
-<td>null</td>
-<td>null</td>
-<td>06/10/25</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-</tr>
-<tr onclick="table_onSelectMasterRow(this, 1, 2)">
-<td>SYS_C0016606729</td>
-<td>Check</td>
-<td>"USADACONVERSAO"&nbsp;IS&nbsp;NOT&nbsp;NULL</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-<td>ENABLED</td>
-<td>NOT&nbsp;DEFERRABLE</td>
-<td>VALIDATED</td>
-<td>GENERATED&nbsp;NAME</td>
-<td>null</td>
-<td>null</td>
-<td>06/10/25</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-</tr>
-<tr onclick="table_onSelectMasterRow(this, 1, 3)">
-<td>SYS_C0016606730</td>
-<td>Check</td>
-<td>"DESATIVADA"&nbsp;IS&nbsp;NOT&nbsp;NULL</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-<td>ENABLED</td>
-<td>NOT&nbsp;DEFERRABLE</td>
-<td>VALIDATED</td>
-<td>GENERATED&nbsp;NAME</td>
-<td>null</td>
-<td>null</td>
-<td>06/10/25</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-</tr>
-<tr onclick="table_onSelectMasterRow(this, 1, 4)">
-<td>SYS_C0016606731</td>
-<td>Check</td>
-<td>"FLAGEXTERNA"&nbsp;IS&nbsp;NOT&nbsp;NULL</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-<td>ENABLED</td>
-<td>NOT&nbsp;DEFERRABLE</td>
-<td>VALIDATED</td>
-<td>GENERATED&nbsp;NAME</td>
-<td>null</td>
-<td>null</td>
-<td>06/10/25</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-</tr>
 </table>
 <br/>
 <hr/>
@@ -254,60 +174,8 @@
 <th>COLUMN_POSITION</th>
 </tr>
 <tr onclick="table_onSelectRow(this, 2)" class="currentrow">
-<td class="currentcell">PARADA</td>
+<td class="currentcell">ID_PARADA</td>
 <td class="currentcell">1</td>
-</tr>
-</table>
-</div>
-</div>
-<div id="Child.0.1.1">
-<div class="childreport"><table id="Table.3" cellpadding="0" cellspacing="0" summary="">
-<tr>
-<th>COLUMN_NAME</th>
-<th>COLUMN_POSITION</th>
-</tr>
-<tr onclick="table_onSelectRow(this, 3)" class="currentrow">
-<td class="currentcell">PARADA</td>
-<td class="currentcell">null</td>
-</tr>
-</table>
-</div>
-</div>
-<div id="Child.0.2.1">
-<div class="childreport"><table id="Table.4" cellpadding="0" cellspacing="0" summary="">
-<tr>
-<th>COLUMN_NAME</th>
-<th>COLUMN_POSITION</th>
-</tr>
-<tr onclick="table_onSelectRow(this, 4)" class="currentrow">
-<td class="currentcell">USADACONVERSAO</td>
-<td class="currentcell">null</td>
-</tr>
-</table>
-</div>
-</div>
-<div id="Child.0.3.1">
-<div class="childreport"><table id="Table.5" cellpadding="0" cellspacing="0" summary="">
-<tr>
-<th>COLUMN_NAME</th>
-<th>COLUMN_POSITION</th>
-</tr>
-<tr onclick="table_onSelectRow(this, 5)" class="currentrow">
-<td class="currentcell">DESATIVADA</td>
-<td class="currentcell">null</td>
-</tr>
-</table>
-</div>
-</div>
-<div id="Child.0.4.1">
-<div class="childreport"><table id="Table.6" cellpadding="0" cellspacing="0" summary="">
-<tr>
-<th>COLUMN_NAME</th>
-<th>COLUMN_POSITION</th>
-</tr>
-<tr onclick="table_onSelectRow(this, 6)" class="currentrow">
-<td class="currentcell">FLAGEXTERNA</td>
-<td class="currentcell">null</td>
 </tr>
 </table>
 </div>
@@ -317,7 +185,7 @@
 </div>
 <div id="Master.2">
 <div class="masterreport">
-<table id="Table.7" cellpadding="0" cellspacing="0" summary="">
+<table id="Table.3" cellpadding="0" cellspacing="0" summary="">
 <tr>
 <th>PRIVILEGE</th>
 <th>GRANTEE</th>
@@ -330,13 +198,13 @@
 </div>
 <div id="Master.3">
 <div class="masterreport">
-<table id="Table.8" cellpadding="0" cellspacing="0" summary="">
+<table id="Table.4" cellpadding="0" cellspacing="0" summary="">
 <th>NAME</th>
 <th>VALUE</th>
 </tr>
 <tr>
 <td>NUM_ROWS</td>
-<td>699</td>
+<td>709</td>
 </tr>
 <tr>
 <td>BLOCKS</td>
@@ -344,19 +212,19 @@
 </tr>
 <tr>
 <td>AVG_ROW_LEN</td>
-<td>28</td>
+<td>29</td>
 </tr>
 <tr>
 <td>SAMPLE_SIZE</td>
-<td>699</td>
+<td>709</td>
 </tr>
 <tr>
 <td>LAST_ANALYZED</td>
-<td>14/10/25</td>
+<td>28/10/25</td>
 </tr>
 <tr>
 <td>LAST_ANALYZED_SINCE</td>
-<td>14/10/25</td>
+<td>28/10/25</td>
 </tr>
 </table>
 <br/>
@@ -375,7 +243,7 @@
 </div>
 <div id="Master.4">
 <div class="masterreport">
-<table id="Table.9" cellpadding="0" cellspacing="0" summary="">
+<table id="Table.5" cellpadding="0" cellspacing="0" summary="">
 <tr>
 <th>TRIGGER_NAME</th>
 <th>TRIGGER_TYPE</th>
@@ -401,7 +269,7 @@
 </div>
 <div id="Master.5">
 <div class="masterreport">
-<table id="Table.10" cellpadding="0" cellspacing="0" summary="">
+<table id="Table.6" cellpadding="0" cellspacing="0" summary="">
 <tr>
 <th>OWNER</th>
 <th>NAME</th>
@@ -427,7 +295,7 @@
 </div>
 <div id="Master.6">
 <div class="masterreport">
-<table id="Table.11" cellpadding="0" cellspacing="0" summary="">
+<table id="Table.7" cellpadding="0" cellspacing="0" summary="">
 <th>NAME</th>
 <th>VALUE</th>
 </tr>
@@ -437,7 +305,7 @@
 </tr>
 <tr>
 <td>LAST_DDL_TIME</td>
-<td>15/10/25</td>
+<td>28/10/25</td>
 </tr>
 <tr>
 <td>OWNER</td>
@@ -517,7 +385,7 @@
 </tr>
 <tr>
 <td>NUM_ROWS</td>
-<td>699</td>
+<td>709</td>
 </tr>
 <tr>
 <td>BLOCKS</td>
@@ -537,7 +405,7 @@
 </tr>
 <tr>
 <td>AVG_ROW_LEN</td>
-<td>28</td>
+<td>29</td>
 </tr>
 <tr>
 <td>AVG_SPACE_FREELIST_BLOCKS</td>
@@ -565,11 +433,11 @@
 </tr>
 <tr>
 <td>SAMPLE_SIZE</td>
-<td>699</td>
+<td>709</td>
 </tr>
 <tr>
 <td>LAST_ANALYZED</td>
-<td>14/10/25</td>
+<td>28/10/25</td>
 </tr>
 <tr>
 <td>PARTITIONED</td>
@@ -684,7 +552,7 @@
 </div>
 <div id="Master.7">
 <div class="masterreport">
-<table id="Table.12" cellpadding="0" cellspacing="0" summary="">
+<table id="Table.8" cellpadding="0" cellspacing="0" summary="">
 <tr>
 <th>PARTITION_NAME</th>
 <th>LAST_ANALYZED</th>
@@ -710,7 +578,7 @@
 </div>
 <div id="Master.8">
 <div class="masterreport">
-<table id="Table.13" cellpadding="0" cellspacing="0" summary="">
+<table id="Table.9" cellpadding="0" cellspacing="0" summary="">
 <tr>
 <th>INDEX_OWNER</th>
 <th>INDEX_NAME</th>
@@ -723,7 +591,7 @@
 <th>JOIN_INDEX</th>
 <th>COLUMNS</th>
 </tr>
-<tr onclick="table_onSelectMasterRow(this, 13, 0)" class="currentrow">
+<tr onclick="table_onSelectMasterRow(this, 9, 0)" class="currentrow">
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">PK_PARADAS</td>
 <td class="currentcell">UNIQUE</td>
@@ -733,9 +601,9 @@
 <td class="currentcell">NO</td>
 <td class="currentcell">null</td>
 <td class="currentcell">NO</td>
-<td class="currentcell">PARADA</td>
+<td class="currentcell">ID_PARADA</td>
 </tr>
-<tr onclick="table_onSelectMasterRow(this, 13, 1)">
+<tr onclick="table_onSelectMasterRow(this, 9, 1)">
 <td>TRIMBOX_REFINED</td>
 <td>IX_DESATIVADA_PARADAS</td>
 <td>NONUNIQUE</td>
@@ -745,9 +613,9 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>DESATIVADA</td>
+<td>FL_DESATIVADA</td>
 </tr>
-<tr onclick="table_onSelectMasterRow(this, 13, 2)">
+<tr onclick="table_onSelectMasterRow(this, 9, 2)">
 <td>TRIMBOX_REFINED</td>
 <td>IX_USADACONVERSAO_PARADAS</td>
 <td>NONUNIQUE</td>
@@ -757,7 +625,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>USADACONVERSAO</td>
+<td>FL_USADACONVERSAO</td>
 </tr>
 </table>
 <br/>
@@ -772,7 +640,7 @@
 <br/>
 <div id="ChildReports.8">
 <div id="Child.0.0.8">
-<div class="currentchildreport"><table id="Table.14" cellpadding="0" cellspacing="0" summary="">
+<div class="currentchildreport"><table id="Table.10" cellpadding="0" cellspacing="0" summary="">
 <tr>
 <th>INDEX_OWNER</th>
 <th>INDEX_NAME</th>
@@ -786,15 +654,15 @@
 <th>COLLATED_COLUMN_ID</th>
 <th>COLUMN_EXPRESSION</th>
 </tr>
-<tr onclick="table_onSelectRow(this, 14)" class="currentrow">
+<tr onclick="table_onSelectRow(this, 10)" class="currentrow">
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">PK_PARADAS</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">PARADAS</td>
-<td class="currentcell">PARADA</td>
+<td class="currentcell">ID_PARADA</td>
 <td class="currentcell">1</td>
-<td class="currentcell">22</td>
-<td class="currentcell">0</td>
+<td class="currentcell">20</td>
+<td class="currentcell">20</td>
 <td class="currentcell">ASC</td>
 <td class="currentcell">null</td>
 <td class="currentcell">null</td>
@@ -803,7 +671,7 @@
 </div>
 </div>
 <div id="Child.0.1.8">
-<div class="childreport"><table id="Table.15" cellpadding="0" cellspacing="0" summary="">
+<div class="childreport"><table id="Table.11" cellpadding="0" cellspacing="0" summary="">
 <tr>
 <th>INDEX_OWNER</th>
 <th>INDEX_NAME</th>
@@ -817,12 +685,12 @@
 <th>COLLATED_COLUMN_ID</th>
 <th>COLUMN_EXPRESSION</th>
 </tr>
-<tr onclick="table_onSelectRow(this, 15)" class="currentrow">
+<tr onclick="table_onSelectRow(this, 11)" class="currentrow">
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">IX_DESATIVADA_PARADAS</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">PARADAS</td>
-<td class="currentcell">DESATIVADA</td>
+<td class="currentcell">FL_DESATIVADA</td>
 <td class="currentcell">1</td>
 <td class="currentcell">1</td>
 <td class="currentcell">1</td>
@@ -834,7 +702,7 @@
 </div>
 </div>
 <div id="Child.0.2.8">
-<div class="childreport"><table id="Table.16" cellpadding="0" cellspacing="0" summary="">
+<div class="childreport"><table id="Table.12" cellpadding="0" cellspacing="0" summary="">
 <tr>
 <th>INDEX_OWNER</th>
 <th>INDEX_NAME</th>
@@ -848,12 +716,12 @@
 <th>COLLATED_COLUMN_ID</th>
 <th>COLUMN_EXPRESSION</th>
 </tr>
-<tr onclick="table_onSelectRow(this, 16)" class="currentrow">
+<tr onclick="table_onSelectRow(this, 12)" class="currentrow">
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">IX_USADACONVERSAO_PARADAS</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">PARADAS</td>
-<td class="currentcell">USADACONVERSAO</td>
+<td class="currentcell">FL_USADACONVERSAO</td>
 <td class="currentcell">1</td>
 <td class="currentcell">1</td>
 <td class="currentcell">1</td>
