@@ -70,23 +70,23 @@
 <th>COMMENTS</th>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 0)" class="currentrow">
-<td class="currentcell">CODFACA</td>
+<td class="currentcell">CD_FACA</td>
 <td class="currentcell">VARCHAR2(30&nbsp;BYTE)</td>
-<td class="currentcell">No</td>
+<td class="currentcell">Yes</td>
 <td class="currentcell">null</td>
 <td class="currentcell">1</td>
 <td class="currentcell">Cod&nbsp;de&nbsp;identificao&nbsp;da&nbsp;faca,&nbsp;utilizado&nbsp;para&nbsp;relacionamento&nbsp;com&nbsp;tarefcon</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 1)">
-<td>STATUS</td>
-<td>NUMBER</td>
+<td>ST_STATUS</td>
+<td>VARCHAR2(5&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>2</td>
 <td>Situao&nbsp;da&nbsp;faca,&nbsp;somente&nbsp;utilizados:&nbsp;1-Ativ&nbsp;-&nbsp;2-Susp&nbsp;-&nbsp;5-Desm</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 2)">
-<td>COMPLAMINA</td>
+<td>VL_COMPLAMINA</td>
 <td>NUMBER</td>
 <td>Yes</td>
 <td>null</td>
@@ -94,8 +94,8 @@
 <td>Quantidade&nbsp;linear&nbsp;de&nbsp;Lamina&nbsp;contida&nbsp;na&nbsp;faca&nbsp;(mm)</td>
 </tr>
 <tr onclick="table_onSelectMasterRow(this, 0, 3)">
-<td>DESATIVADOSN</td>
-<td>CHAR(1&nbsp;BYTE)</td>
+<td>FL_DESATIVADOSN</td>
+<td>VARCHAR2(1&nbsp;BYTE)</td>
 <td>Yes</td>
 <td>null</td>
 <td>4</td>
@@ -127,46 +127,6 @@
 <th>INVALID</th>
 <th>VIEW_RELATED</th>
 </tr>
-<tr onclick="table_onSelectMasterRow(this, 1, 0)" class="currentrow">
-<td class="currentcell">PK_FACAS</td>
-<td class="currentcell">Primary_Key</td>
-<td class="currentcell">null</td>
-<td class="currentcell">null</td>
-<td class="currentcell">null</td>
-<td class="currentcell">null</td>
-<td class="currentcell">null</td>
-<td class="currentcell">ENABLED</td>
-<td class="currentcell">NOT&nbsp;DEFERRABLE</td>
-<td class="currentcell">VALIDATED</td>
-<td class="currentcell">USER&nbsp;NAME</td>
-<td class="currentcell">null</td>
-<td class="currentcell">null</td>
-<td class="currentcell">06/10/25</td>
-<td class="currentcell">TRIMBOX_REFINED</td>
-<td class="currentcell">PK_FACAS</td>
-<td class="currentcell">null</td>
-<td class="currentcell">null</td>
-</tr>
-<tr onclick="table_onSelectMasterRow(this, 1, 1)">
-<td>SYS_C0016606691</td>
-<td>Check</td>
-<td>"CODFACA"&nbsp;IS&nbsp;NOT&nbsp;NULL</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-<td>ENABLED</td>
-<td>NOT&nbsp;DEFERRABLE</td>
-<td>VALIDATED</td>
-<td>GENERATED&nbsp;NAME</td>
-<td>null</td>
-<td>null</td>
-<td>06/10/25</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-<td>null</td>
-</tr>
 </table>
 <br/>
 <hr/>
@@ -179,38 +139,12 @@
 </div>
 <br/>
 <div id="ChildReports.1">
-<div id="Child.0.0.1">
-<div class="currentchildreport"><table id="Table.2" cellpadding="0" cellspacing="0" summary="">
-<tr>
-<th>COLUMN_NAME</th>
-<th>COLUMN_POSITION</th>
-</tr>
-<tr onclick="table_onSelectRow(this, 2)" class="currentrow">
-<td class="currentcell">CODFACA</td>
-<td class="currentcell">1</td>
-</tr>
-</table>
-</div>
-</div>
-<div id="Child.0.1.1">
-<div class="childreport"><table id="Table.3" cellpadding="0" cellspacing="0" summary="">
-<tr>
-<th>COLUMN_NAME</th>
-<th>COLUMN_POSITION</th>
-</tr>
-<tr onclick="table_onSelectRow(this, 3)" class="currentrow">
-<td class="currentcell">CODFACA</td>
-<td class="currentcell">null</td>
-</tr>
-</table>
-</div>
-</div>
 </div>
 </div>
 </div>
 <div id="Master.2">
 <div class="masterreport">
-<table id="Table.4" cellpadding="0" cellspacing="0" summary="">
+<table id="Table.2" cellpadding="0" cellspacing="0" summary="">
 <tr>
 <th>PRIVILEGE</th>
 <th>GRANTEE</th>
@@ -223,13 +157,13 @@
 </div>
 <div id="Master.3">
 <div class="masterreport">
-<table id="Table.5" cellpadding="0" cellspacing="0" summary="">
+<table id="Table.3" cellpadding="0" cellspacing="0" summary="">
 <th>NAME</th>
 <th>VALUE</th>
 </tr>
 <tr>
 <td>NUM_ROWS</td>
-<td>8139</td>
+<td>8166</td>
 </tr>
 <tr>
 <td>BLOCKS</td>
@@ -241,15 +175,15 @@
 </tr>
 <tr>
 <td>SAMPLE_SIZE</td>
-<td>8139</td>
+<td>8166</td>
 </tr>
 <tr>
 <td>LAST_ANALYZED</td>
-<td>15/10/25</td>
+<td>30/10/25</td>
 </tr>
 <tr>
 <td>LAST_ANALYZED_SINCE</td>
-<td>15/10/25</td>
+<td>30/10/25</td>
 </tr>
 </table>
 <br/>
@@ -268,7 +202,7 @@
 </div>
 <div id="Master.4">
 <div class="masterreport">
-<table id="Table.6" cellpadding="0" cellspacing="0" summary="">
+<table id="Table.4" cellpadding="0" cellspacing="0" summary="">
 <tr>
 <th>TRIGGER_NAME</th>
 <th>TRIGGER_TYPE</th>
@@ -294,7 +228,7 @@
 </div>
 <div id="Master.5">
 <div class="masterreport">
-<table id="Table.7" cellpadding="0" cellspacing="0" summary="">
+<table id="Table.5" cellpadding="0" cellspacing="0" summary="">
 <tr>
 <th>OWNER</th>
 <th>NAME</th>
@@ -320,7 +254,7 @@
 </div>
 <div id="Master.6">
 <div class="masterreport">
-<table id="Table.8" cellpadding="0" cellspacing="0" summary="">
+<table id="Table.6" cellpadding="0" cellspacing="0" summary="">
 <th>NAME</th>
 <th>VALUE</th>
 </tr>
@@ -330,7 +264,7 @@
 </tr>
 <tr>
 <td>LAST_DDL_TIME</td>
-<td>15/10/25</td>
+<td>28/10/25</td>
 </tr>
 <tr>
 <td>OWNER</td>
@@ -410,7 +344,7 @@
 </tr>
 <tr>
 <td>NUM_ROWS</td>
-<td>8139</td>
+<td>8166</td>
 </tr>
 <tr>
 <td>BLOCKS</td>
@@ -458,11 +392,11 @@
 </tr>
 <tr>
 <td>SAMPLE_SIZE</td>
-<td>8139</td>
+<td>8166</td>
 </tr>
 <tr>
 <td>LAST_ANALYZED</td>
-<td>15/10/25</td>
+<td>30/10/25</td>
 </tr>
 <tr>
 <td>PARTITIONED</td>
@@ -577,7 +511,7 @@
 </div>
 <div id="Master.7">
 <div class="masterreport">
-<table id="Table.9" cellpadding="0" cellspacing="0" summary="">
+<table id="Table.7" cellpadding="0" cellspacing="0" summary="">
 <tr>
 <th>PARTITION_NAME</th>
 <th>LAST_ANALYZED</th>
@@ -603,7 +537,7 @@
 </div>
 <div id="Master.8">
 <div class="masterreport">
-<table id="Table.10" cellpadding="0" cellspacing="0" summary="">
+<table id="Table.8" cellpadding="0" cellspacing="0" summary="">
 <tr>
 <th>INDEX_OWNER</th>
 <th>INDEX_NAME</th>
@@ -616,31 +550,19 @@
 <th>JOIN_INDEX</th>
 <th>COLUMNS</th>
 </tr>
-<tr onclick="table_onSelectMasterRow(this, 10, 0)" class="currentrow">
+<tr onclick="table_onSelectMasterRow(this, 8, 0)" class="currentrow">
 <td class="currentcell">TRIMBOX_REFINED</td>
-<td class="currentcell">PK_FACAS</td>
-<td class="currentcell">UNIQUE</td>
+<td class="currentcell">IX_STATUS_FACAS</td>
+<td class="currentcell">NONUNIQUE</td>
 <td class="currentcell">VALID</td>
 <td class="currentcell">NORMAL</td>
 <td class="currentcell">N</td>
 <td class="currentcell">NO</td>
 <td class="currentcell">null</td>
 <td class="currentcell">NO</td>
-<td class="currentcell">CODFACA</td>
+<td class="currentcell">ST_STATUS</td>
 </tr>
-<tr onclick="table_onSelectMasterRow(this, 10, 1)">
-<td>TRIMBOX_REFINED</td>
-<td>IX_STATUS_FACAS</td>
-<td>NONUNIQUE</td>
-<td>VALID</td>
-<td>NORMAL</td>
-<td>N</td>
-<td>NO</td>
-<td>null</td>
-<td>NO</td>
-<td>STATUS</td>
-</tr>
-<tr onclick="table_onSelectMasterRow(this, 10, 2)">
+<tr onclick="table_onSelectMasterRow(this, 8, 1)">
 <td>TRIMBOX_REFINED</td>
 <td>IX_COMPLAMINA_FACAS</td>
 <td>NONUNIQUE</td>
@@ -650,7 +572,7 @@
 <td>NO</td>
 <td>null</td>
 <td>NO</td>
-<td>COMPLAMINA</td>
+<td>VL_COMPLAMINA</td>
 </tr>
 </table>
 <br/>
@@ -665,7 +587,7 @@
 <br/>
 <div id="ChildReports.8">
 <div id="Child.0.0.8">
-<div class="currentchildreport"><table id="Table.11" cellpadding="0" cellspacing="0" summary="">
+<div class="currentchildreport"><table id="Table.9" cellpadding="0" cellspacing="0" summary="">
 <tr>
 <th>INDEX_OWNER</th>
 <th>INDEX_NAME</th>
@@ -679,15 +601,15 @@
 <th>COLLATED_COLUMN_ID</th>
 <th>COLUMN_EXPRESSION</th>
 </tr>
-<tr onclick="table_onSelectRow(this, 11)" class="currentrow">
+<tr onclick="table_onSelectRow(this, 9)" class="currentrow">
 <td class="currentcell">TRIMBOX_REFINED</td>
-<td class="currentcell">PK_FACAS</td>
+<td class="currentcell">IX_STATUS_FACAS</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">FACAS</td>
-<td class="currentcell">CODFACA</td>
+<td class="currentcell">ST_STATUS</td>
 <td class="currentcell">1</td>
-<td class="currentcell">30</td>
-<td class="currentcell">30</td>
+<td class="currentcell">5</td>
+<td class="currentcell">5</td>
 <td class="currentcell">ASC</td>
 <td class="currentcell">null</td>
 <td class="currentcell">null</td>
@@ -696,7 +618,7 @@
 </div>
 </div>
 <div id="Child.0.1.8">
-<div class="childreport"><table id="Table.12" cellpadding="0" cellspacing="0" summary="">
+<div class="childreport"><table id="Table.10" cellpadding="0" cellspacing="0" summary="">
 <tr>
 <th>INDEX_OWNER</th>
 <th>INDEX_NAME</th>
@@ -710,43 +632,12 @@
 <th>COLLATED_COLUMN_ID</th>
 <th>COLUMN_EXPRESSION</th>
 </tr>
-<tr onclick="table_onSelectRow(this, 12)" class="currentrow">
-<td class="currentcell">TRIMBOX_REFINED</td>
-<td class="currentcell">IX_STATUS_FACAS</td>
-<td class="currentcell">TRIMBOX_REFINED</td>
-<td class="currentcell">FACAS</td>
-<td class="currentcell">STATUS</td>
-<td class="currentcell">1</td>
-<td class="currentcell">22</td>
-<td class="currentcell">0</td>
-<td class="currentcell">ASC</td>
-<td class="currentcell">null</td>
-<td class="currentcell">null</td>
-</tr>
-</table>
-</div>
-</div>
-<div id="Child.0.2.8">
-<div class="childreport"><table id="Table.13" cellpadding="0" cellspacing="0" summary="">
-<tr>
-<th>INDEX_OWNER</th>
-<th>INDEX_NAME</th>
-<th>TABLE_OWNER</th>
-<th>TABLE_NAME</th>
-<th>COLUMN_NAME</th>
-<th>COLUMN_POSITION</th>
-<th>COLUMN_LENGTH</th>
-<th>CHAR_LENGTH</th>
-<th>DESCEND</th>
-<th>COLLATED_COLUMN_ID</th>
-<th>COLUMN_EXPRESSION</th>
-</tr>
-<tr onclick="table_onSelectRow(this, 13)" class="currentrow">
+<tr onclick="table_onSelectRow(this, 10)" class="currentrow">
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">IX_COMPLAMINA_FACAS</td>
 <td class="currentcell">TRIMBOX_REFINED</td>
 <td class="currentcell">FACAS</td>
-<td class="currentcell">COMPLAMINA</td>
+<td class="currentcell">VL_COMPLAMINA</td>
 <td class="currentcell">1</td>
 <td class="currentcell">22</td>
 <td class="currentcell">0</td>
