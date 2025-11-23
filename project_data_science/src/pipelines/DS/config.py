@@ -4,34 +4,33 @@ Configuration and constants
 
 This module centralises configuration variables used throughout the pipeline.
 Defining paths in one place makes it easier to adapt the code to different
-environments (e.g. training locally versus on a cloud server).  Change the
-constants below to point at your actual data locations.  All paths are
-relative to the project root unless explicitly marked as absolute.
+environments (e.g. training locally versus on a cloud server).
+
+All paths are now managed via the centralized ConfigManager which uses
+environment variables and the src/config.py Pydantic settings.
 """
 from pathlib import Path
 
-# Base directory for data.  By default we assume the notebooks live in a
-# ``notebooks/`` directory three levels deeper than the project root and
-# therefore the raw data is located in ``data/raw`` relative to the project
-# root.  Adjust ``DATA_DIR`` if your folder layout differs.
-PROJECT_ROOT: Path = Path(__file__).resolve().parents[2]
+# Import centralized config manager
+import sys
+SRC_DIR = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(SRC_DIR))
 
-# Allow the user to override DATA_DIR by editing this constant.  Set the
-# string to "" to fall back to the default ``PROJECT_ROOT / "data"``.
-_DATA_DIR_DEFAULT = PROJECT_ROOT / "data"
-DATA_DIR_CONFIG = "/home/adami/Documentos/Projeto_IA_AMCOM/project_data_science/data/"
-if DATA_DIR_CONFIG:
-    DATA_DIR: Path = Path(DATA_DIR_CONFIG).expanduser()
-else:
-    DATA_DIR = _DATA_DIR_DEFAULT
+from src.config_manager import get_config_manager
 
-# Subdirectories for raw and processed data.  Raw data should contain the
-# parquet files provided by the manufacturing systems.  Processed data
-# produced by these pipelines is saved into ``ML_DIR``.  You can override
-# these values when calling the pipeline functions.
+# Initialize config manager
+_cm = get_config_manager()
 
-RAW_DIR: Path = DATA_DIR / "raw"
-ML_DIR: Path = DATA_DIR / "ml"
+# Project root and data directories
+PROJECT_ROOT: Path = SRC_DIR
+DATA_DIR: Path = _cm.data_dir
+RAW_DIR: Path = _cm.raw_path
+ML_DIR: Path = _cm.ml_path
+
+# Additional directories
+TRUSTED_DIR: Path = _cm.trusted_path
+REFINED_DIR: Path = _cm.refined_path
+MODELS_DIR: Path = _cm.models_dir
 
 # Filenames for key tables.  These match the naming conventions used in the
 # original notebooks.  If your raw data files live elsewhere or have
