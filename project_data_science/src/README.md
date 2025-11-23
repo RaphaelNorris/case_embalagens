@@ -108,30 +108,6 @@ df = create_production_features(df, group_cols=['cod_maquina'])
 
 ---
 
-### 🤖 [models/](./models/)
-**Treinamento e predição** de modelos de Machine Learning.
-
-**Principais arquivos:**
-- `train_model.py` - Treinamento e avaliação
-- `predict_model.py` - Predições
-
-**Modelos suportados:**
-- Random Forest
-- XGBoost
-- LightGBM
-
-**Uso:**
-```python
-from src.models.train_model import train_production_model, save_model
-
-model, metrics = train_production_model(X, y, model_type='xgboost')
-save_model(model, 'production_v1', metadata)
-```
-
-[📖 Documentação completa →](./models/README.md)
-
----
-
 ### 📈 [viz/](./viz/)
 **Visualizações interativas** usando Plotly.
 
@@ -274,7 +250,7 @@ tests/
 ├── unit/              # Testes unitários por módulo
 │   ├── test_data.py
 │   ├── test_features.py
-│   └── test_models.py
+│   └── test_catboost_fix.py
 ├── integration/       # Testes de integração
 └── dashboards/        # Testes de dashboards
 ```
