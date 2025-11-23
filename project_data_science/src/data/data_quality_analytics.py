@@ -34,7 +34,6 @@ def get_connection_sqlserver():
     except Exception as e:
         print(f"pymssql falhou: {str(e)[:50]}")
 
-    # Tenta conexão via pyodbc com diferentes drivers
     try:
         import pyodbc
         drivers = [
@@ -111,7 +110,6 @@ def build_filtered_query(table_name, schema='dbo', filters=None, columns=None):
     select_clause = ', '.join(columns) if columns else '*'
     query = f"SELECT {select_clause} FROM {schema}.{table_name}"
     params = []
-    # Aplica filtros se fornecidos
     if filters:
         where_conditions = []
         for col_name, filter_config in filters.items():
@@ -136,7 +134,7 @@ def build_filtered_query(table_name, schema='dbo', filters=None, columns=None):
             query += " WHERE " + " AND ".join(where_conditions)
     return query, tuple(params)
 
-def generate_markdown_report(all_column_analysis, table_name, schema, filters, 
+def generate_markdown_report(all_column_analysis, table_name, schema, filters,
                            columns_to_exclude, exclusion_reasons, query, params):
     """
     Gera um relatório em Markdown descrevendo os resultados da análise de qualidade de dados.
@@ -160,16 +158,16 @@ def generate_markdown_report(all_column_analysis, table_name, schema, filters,
     markdown = """<style>
     body { background-color: #ffffff; color: #111111; font-family: Arial, sans-serif; }
     h1, h2, h3 { color: #002060; }  /* azul escuro forte */
-    
+
     table { border-collapse: collapse; width: 100%; margin-top: 10px; }
     th, td { border: 1px solid #444; padding: 8px; text-align: center; }
-    
+
     th { background-color: #002060; color: #ffffff; }  /* cabeçalho azul escuro com letras brancas */
     td { color: #111111; background-color: #fafafa; } /* células cinza muito claro */
-    
+
     .manter { color: #006400; font-weight: bold; }  /* verde escuro */
     .excluir { color: #b22222; font-weight: bold; } /* vermelho escuro */
-    
+
     code { background-color: #f0f0f0; color: #002060; padding: 3px 5px; border-radius: 4px; font-weight: bold; }
     </style>
     \n\n"""
@@ -180,7 +178,7 @@ def generate_markdown_report(all_column_analysis, table_name, schema, filters,
                  f"- **Data/Hora:** {timestamp}\n"
                  f"- **Total de Registros:** {len(all_column_analysis[0]['Dataframe']) if all_column_analysis else 'N/A'}\n"
                  f"- **Total de Colunas:** {len(all_column_analysis)}\n"
-                  "- **Autor:** Raphael Norris\n\n")         
+                  "- **Autor:** Raphael Norris\n\n")
 
     markdown += "---\n\n## Filtros Aplicados\n"
     if filters:
@@ -243,7 +241,7 @@ def generate_markdown_report(all_column_analysis, table_name, schema, filters,
                  "Colunas que não atendem a esses critérios são mantidas.\n")
     return markdown
 
-def identify_columns_to_exclude(table_name, schema='dbo', filters=None, 
+def identify_columns_to_exclude(table_name, schema='dbo', filters=None,
                                null_threshold=90, zero_threshold=80):
     """
     Realiza a análise de exclusão de colunas com base em critérios de qualidade.
