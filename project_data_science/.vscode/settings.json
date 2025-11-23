@@ -43,5 +43,8 @@
     "MD007": { "indent": 4 }
   },
   "ruff.configuration": "--config=.code_quality/ruff.toml",
-  "ruff.format.preview": false
+  "ruff.format.preview": false,
+  "cSpell.words": [
+    "PEDIDO"
+  ]
 }

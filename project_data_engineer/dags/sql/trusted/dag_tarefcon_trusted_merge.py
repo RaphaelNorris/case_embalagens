@@ -57,7 +57,15 @@ def _make_oracle_conn_trusted():
     else:
         dsn = oracledb.makedsn(c.host, port, service_name=c.schema)
 
-    return oracledb.connect(user=c.login, password=c.password, dsn=dsn)
+    # Configurações otimizadas para bulk operations
+    return oracledb.connect(
+        user=c.login, 
+        password=c.password, 
+        dsn=dsn,
+        threaded=True,
+        events=False,
+        arraysize=1000
+    )
 
 # -----------------
 # Converters/mapeamentos
@@ -148,18 +156,17 @@ def _map_row_to_oracle_tarefcon(row: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 # -----------------
-# Tarefa principal
+# Tarefa principal com MERGE otimizado
 # -----------------
 def etl_tarefcon(**context):
-    # Configuração de paginação - 40.000 registros por lote
-    page_size = 20000
+    # Configuração de paginação - AUMENTADO para 50.000 registros por lote
+    page_size = 50000
     offset = 0
     total_processed = 0
     batch_count = 0
     
-    # **ALTERAÇÃO: REMOVIDA completamente a limpeza da tabela destino**
-    log.info("Iniciando ETL TAREFCON - SEM LIMPEZA DA TABELA DESTINO")
-    log.info("Os dados existentes na tabela TAREFCON serão mantidos e atualizados via MERGE")
+    log.info("Iniciando ETL TAREFCON - MERGE otimizado com tabela temporária")
+    log.info("Configuração: %s registros por lote", page_size)
 
     # Loop de paginação
     while True:
@@ -212,8 +219,8 @@ def etl_tarefcon(**context):
                 if batch_count == 0 and payload:
                     log.info("Primeiro registro mapeado: %s", {k: v for k, v in list(payload[0].items())[:5]})
                 
-                # 3) Processa o lote atual com MERGE
-                _process_batch_tarefcon(payload, batch_count + 1)
+                # 3) Processa o lote atual com MERGE otimizado
+                _process_batch_tarefcon_optimized(payload, batch_count + 1)
                 total_processed += len(payload)
                 log.info("Página %s processada: %s registros válidos (total acumulado: %s)", 
                         batch_count + 1, len(payload), total_processed)
@@ -236,48 +243,72 @@ def etl_tarefcon(**context):
 
     log.info("ETL concluída: %s registros processados com sucesso em %s lotes.", total_processed, batch_count)
 
-def _process_batch_tarefcon(payload, batch_number):
-    """Processa um lote de registros no Oracle com MERGE (UPSERT)"""
+def _process_batch_tarefcon_optimized(payload, batch_number):
+    """Processa um lote de registros no Oracle com MERGE otimizado usando tabela temporária"""
     
+    # SQL para criar tabela temporária
+    create_temp_sql = """
+        CREATE GLOBAL TEMPORARY TABLE tmp_tarefcon_batch (
+            ID_MAQUINA VARCHAR2(100),
+            CD_TAREFA VARCHAR2(100),
+            FL_PARADA VARCHAR2(1),
+            CD_PARADAOUCONV VARCHAR2(100),
+            TX_TURMA VARCHAR2(100),
+            TX_OP VARCHAR2(100),
+            ID_PEDIDO VARCHAR2(100),
+            ID_ITEM VARCHAR2(100),
+            VL_REPROGRAMACAO NUMBER,
+            VL_PASSAGENS NUMBER,
+            QT_ARRANJO NUMBER,
+            VL_GRAMATURA NUMBER,
+            QT_PROGRAMADA NUMBER,
+            VL_CHAPASALIMENTADAS NUMBER,
+            QT_PRODUZIDA NUMBER,
+            QT_AJUSTE NUMBER,
+            VL_DURACAOPREVISTA NUMBER,
+            DT_INICIO TIMESTAMP,
+            DT_FIM TIMESTAMP,
+            DT_DIADATURMA TIMESTAMP,
+            ID_CLIENTE VARCHAR2(100),
+            ID_USUARIO VARCHAR2(100),
+            DT_CRIACAO TIMESTAMP,
+            VL_USUARIOULTALTERACAO VARCHAR2(100),
+            DT_ULTIMAALTERACAO TIMESTAMP,
+            VL_ORIGEMREGISTRO VARCHAR2(100),
+            TX_DESCORIGEMREGISTRO VARCHAR2(500),
+            FL_SKIPFEED VARCHAR2(1),
+            TX_OPONDULADA VARCHAR2(100),
+            VL_TAREFAPRODUCAO NUMBER,
+            FL_REFILEDIRETOPRENSA VARCHAR2(1),
+            VL_DURACAO NUMBER,
+            ID_SECAOMAQUINAPARADA VARCHAR2(100),
+            CD_FACA VARCHAR2(100)
+        ) ON COMMIT PRESERVE ROWS
+    """
+    
+    # SQL para inserir na tabela temporária
+    insert_temp_sql = """
+        INSERT INTO tmp_tarefcon_batch VALUES (
+            :ID_MAQUINA, :CD_TAREFA, :FL_PARADA, :CD_PARADAOUCONV, :TX_TURMA, 
+            :TX_OP, :ID_PEDIDO, :ID_ITEM, :VL_REPROGRAMACAO, :VL_PASSAGENS, 
+            :QT_ARRANJO, :VL_GRAMATURA, :QT_PROGRAMADA, :VL_CHAPASALIMENTADAS, 
+            :QT_PRODUZIDA, :QT_AJUSTE, :VL_DURACAOPREVISTA, :DT_INICIO, :DT_FIM, 
+            :DT_DIADATURMA, :ID_CLIENTE, :ID_USUARIO, :DT_CRIACAO, 
+            :VL_USUARIOULTALTERACAO, :DT_ULTIMAALTERACAO, :VL_ORIGEMREGISTRO, 
+            :TX_DESCORIGEMREGISTRO, :FL_SKIPFEED, :TX_OPONDULADA, 
+            :VL_TAREFAPRODUCAO, :FL_REFILEDIRETOPRENSA, :VL_DURACAO, 
+            :ID_SECAOMAQUINAPARADA, :CD_FACA
+        )
+    """
+    
+    # SQL do MERGE otimizado
     merge_sql = """
         MERGE INTO TAREFCON t 
-        USING (SELECT 
-            :ID_MAQUINA as ID_MAQUINA,
-            :CD_TAREFA as CD_TAREFA,
-            :FL_PARADA as FL_PARADA,
-            :CD_PARADAOUCONV as CD_PARADAOUCONV,
-            :TX_TURMA as TX_TURMA,
-            :TX_OP as TX_OP,
-            :ID_PEDIDO as ID_PEDIDO,
-            :ID_ITEM as ID_ITEM,
-            :VL_REPROGRAMACAO as VL_REPROGRAMACAO,
-            :VL_PASSAGENS as VL_PASSAGENS,
-            :QT_ARRANJO as QT_ARRANJO,
-            :VL_GRAMATURA as VL_GRAMATURA,
-            :QT_PROGRAMADA as QT_PROGRAMADA,
-            :VL_CHAPASALIMENTADAS as VL_CHAPASALIMENTADAS,
-            :QT_PRODUZIDA as QT_PRODUZIDA,
-            :QT_AJUSTE as QT_AJUSTE,
-            :VL_DURACAOPREVISTA as VL_DURACAOPREVISTA,
-            :DT_INICIO as DT_INICIO,
-            :DT_FIM as DT_FIM,
-            :DT_DIADATURMA as DT_DIADATURMA,
-            :ID_CLIENTE as ID_CLIENTE,
-            :ID_USUARIO as ID_USUARIO,
-            :DT_CRIACAO as DT_CRIACAO,
-            :VL_USUARIOULTALTERACAO as VL_USUARIOULTALTERACAO,
-            :DT_ULTIMAALTERACAO as DT_ULTIMAALTERACAO,
-            :VL_ORIGEMREGISTRO as VL_ORIGEMREGISTRO,
-            :TX_DESCORIGEMREGISTRO as TX_DESCORIGEMREGISTRO,
-            :FL_SKIPFEED as FL_SKIPFEED,
-            :TX_OPONDULADA as TX_OPONDULADA,
-            :VL_TAREFAPRODUCAO as VL_TAREFAPRODUCAO,
-            :FL_REFILEDIRETOPRENSA as FL_REFILEDIRETOPRENSA,
-            :VL_DURACAO as VL_DURACAO,
-            :ID_SECAOMAQUINAPARADA as ID_SECAOMAQUINAPARADA,
-            :CD_FACA as CD_FACA
-        FROM dual) s 
-        ON (t.ID_MAQUINA = s.ID_MAQUINA AND t.CD_TAREFA = s.CD_TAREFA AND t.ID_PEDIDO = s.ID_PEDIDO AND t.ID_ITEM = s.ID_ITEM)
+        USING tmp_tarefcon_batch s 
+        ON (t.ID_MAQUINA = s.ID_MAQUINA 
+            AND t.CD_TAREFA = s.CD_TAREFA 
+            AND t.ID_PEDIDO = s.ID_PEDIDO 
+            AND t.ID_ITEM = s.ID_ITEM)
         WHEN MATCHED THEN UPDATE SET 
             t.FL_PARADA = s.FL_PARADA,
             t.CD_PARADAOUCONV = s.CD_PARADAOUCONV,
@@ -310,35 +341,65 @@ def _process_batch_tarefcon(payload, batch_number):
             t.ID_SECAOMAQUINAPARADA = s.ID_SECAOMAQUINAPARADA,
             t.CD_FACA = s.CD_FACA
         WHEN NOT MATCHED THEN INSERT (
-            ID_MAQUINA, CD_TAREFA, FL_PARADA, CD_PARADAOUCONV, TX_TURMA, TX_OP, ID_PEDIDO, ID_ITEM,
-            VL_REPROGRAMACAO, VL_PASSAGENS, QT_ARRANJO, VL_GRAMATURA, QT_PROGRAMADA,
-            VL_CHAPASALIMENTADAS, QT_PRODUZIDA, QT_AJUSTE, VL_DURACAOPREVISTA,
-            DT_INICIO, DT_FIM, DT_DIADATURMA,
-            ID_CLIENTE, ID_USUARIO, DT_CRIACAO, VL_USUARIOULTALTERACAO, DT_ULTIMAALTERACAO,
-            VL_ORIGEMREGISTRO, TX_DESCORIGEMREGISTRO, FL_SKIPFEED, TX_OPONDULADA,
-            VL_TAREFAPRODUCAO, FL_REFILEDIRETOPRENSA, VL_DURACAO, ID_SECAOMAQUINAPARADA, CD_FACA
+            ID_MAQUINA, CD_TAREFA, FL_PARADA, CD_PARADAOUCONV, TX_TURMA, TX_OP, 
+            ID_PEDIDO, ID_ITEM, VL_REPROGRAMACAO, VL_PASSAGENS, QT_ARRANJO, 
+            VL_GRAMATURA, QT_PROGRAMADA, VL_CHAPASALIMENTADAS, QT_PRODUZIDA, 
+            QT_AJUSTE, VL_DURACAOPREVISTA, DT_INICIO, DT_FIM, DT_DIADATURMA,
+            ID_CLIENTE, ID_USUARIO, DT_CRIACAO, VL_USUARIOULTALTERACAO, 
+            DT_ULTIMAALTERACAO, VL_ORIGEMREGISTRO, TX_DESCORIGEMREGISTRO, 
+            FL_SKIPFEED, TX_OPONDULADA, VL_TAREFAPRODUCAO, FL_REFILEDIRETOPRENSA, 
+            VL_DURACAO, ID_SECAOMAQUINAPARADA, CD_FACA
         ) VALUES (
-            s.ID_MAQUINA, s.CD_TAREFA, s.FL_PARADA, s.CD_PARADAOUCONV, s.TX_TURMA, s.TX_OP, s.ID_PEDIDO, s.ID_ITEM,
-            s.VL_REPROGRAMACAO, s.VL_PASSAGENS, s.QT_ARRANJO, s.VL_GRAMATURA, s.QT_PROGRAMADA,
-            s.VL_CHAPASALIMENTADAS, s.QT_PRODUZIDA, s.QT_AJUSTE, s.VL_DURACAOPREVISTA,
-            s.DT_INICIO, s.DT_FIM, s.DT_DIADATURMA,
-            s.ID_CLIENTE, s.ID_USUARIO, s.DT_CRIACAO, s.VL_USUARIOULTALTERACAO, s.DT_ULTIMAALTERACAO,
-            s.VL_ORIGEMREGISTRO, s.TX_DESCORIGEMREGISTRO, s.FL_SKIPFEED, s.TX_OPONDULADA,
-            s.VL_TAREFAPRODUCAO, s.FL_REFILEDIRETOPRENSA, s.VL_DURACAO, s.ID_SECAOMAQUINAPARADA, s.CD_FACA
+            s.ID_MAQUINA, s.CD_TAREFA, s.FL_PARADA, s.CD_PARADAOUCONV, s.TX_TURMA, 
+            s.TX_OP, s.ID_PEDIDO, s.ID_ITEM, s.VL_REPROGRAMACAO, s.VL_PASSAGENS, 
+            s.QT_ARRANJO, s.VL_GRAMATURA, s.QT_PROGRAMADA, s.VL_CHAPASALIMENTADAS, 
+            s.QT_PRODUZIDA, s.QT_AJUSTE, s.VL_DURACAOPREVISTA, s.DT_INICIO, s.DT_FIM, 
+            s.DT_DIADATURMA, s.ID_CLIENTE, s.ID_USUARIO, s.DT_CRIACAO, 
+            s.VL_USUARIOULTALTERACAO, s.DT_ULTIMAALTERACAO, s.VL_ORIGEMREGISTRO, 
+            s.TX_DESCORIGEMREGISTRO, s.FL_SKIPFEED, s.TX_OPONDULADA, 
+            s.VL_TAREFAPRODUCAO, s.FL_REFILEDIRETOPRENSA, s.VL_DURACAO, 
+            s.ID_SECAOMAQUINAPARADA, s.CD_FACA
         )
     """
-
+    
     dst = _make_oracle_conn_trusted()
     try:
         cur = dst.cursor()
         
-        # Executa o MERGE
-        cur.executemany(merge_sql, payload)
+        # Criar tabela temporária (com tratamento de erro caso já exista)
+        try:
+            cur.execute("DROP TABLE tmp_tarefcon_batch")
+            log.debug("Tabela temporária anterior removida")
+        except Exception as e:
+            log.debug("Tabela temporária não existia ou não pôde ser removida: %s", str(e))
+        
+        cur.execute(create_temp_sql)
+        log.debug("Tabela temporária criada com sucesso")
+        
+        # Bulk insert na tabela temporária
+        start_time = datetime.now()
+        cur.executemany(insert_temp_sql, payload)
+        temp_insert_time = (datetime.now() - start_time).total_seconds()
+        
+        log.info("Lote %s: %s registros carregados na tabela temporária em %.2f segundos", 
+                batch_number, len(payload), temp_insert_time)
+        
+        # Executar MERGE
+        start_time = datetime.now()
+        cur.execute(merge_sql)
+        affected_rows = cur.rowcount
+        merge_time = (datetime.now() - start_time).total_seconds()
+        
+        # Limpar tabela temporária
+        cur.execute("TRUNCATE TABLE tmp_tarefcon_batch")
+        
         dst.commit()
-        log.info("TRUSTED <- Lote %s: %s registros processados com MERGE (UPSERT).", batch_number, len(payload))
+        
+        log.info("TRUSTED <- Lote %s: MERGE concluído - %s registros afetados em %.2f segundos", 
+                batch_number, affected_rows, merge_time)
             
     except Exception as e:
-        log.error("Erro ao fazer MERGE no Oracle (lote %s): %s", batch_number, str(e))
+        log.error("Erro no MERGE otimizado (lote %s): %s", batch_number, str(e))
         dst.rollback()
         raise
     finally:
@@ -348,16 +409,17 @@ def _process_batch_tarefcon(payload, batch_number):
 # DAG
 # -----------------
 with DAG(
-    dag_id="etl_raw_to_trusted_tarefcon",
+    dag_id="etl_raw_to_trusted_tarefcon_optimized",
     start_date=datetime(2025, 1, 1),
     schedule=None,
     catchup=False,
-    tags=["etl", "sqlserver", "oracle", "tarefcon"],
+    tags=["etl", "sqlserver", "oracle", "tarefcon", "optimized"],
     default_args={
         'retries': 2,
+        'execution_timeout': timedelta(hours=2)  # Timeout aumentado para processamento pesado
     }
 ):
     merge_upsert = PythonOperator(
-        task_id="merge_upsert_tarefcon",
+        task_id="merge_upsert_tarefcon_optimized",
         python_callable=etl_tarefcon,
     )
