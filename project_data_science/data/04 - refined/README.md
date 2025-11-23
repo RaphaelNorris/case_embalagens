@@ -1,15 +1,27 @@
-# Camada Gold
+# 🥇 Refined Layer (Gold)
 
-A camada **Gold** representa os dados **altamente refinados e prontos para consumo final**, seja por dashboards, relatórios, APIs ou outros sistemas.
+## Propósito
+Dados **agregados e otimizados** para BI e dashboards.
 
-Esses dados já passaram por todas as validações e enriquecimentos necessários e têm **alta confiança para tomada de decisão**.
+## Características
+- Denormalização
+- Agregações pré-calculadas
+- Métricas de negócio
+- Otimizado para leitura
 
-## Exemplos de uso
-- KPIs agregados por período
-- Tabelas de input para dashboards executivos
-- Datasets consolidados e auditáveis
+## Agregações Típicas
+- KPIs de produção (diário, semanal, mensal)
+- Métricas de paradas por máquina/cliente
+- Análise ABC de clientes/produtos
+- Performance de máquinas
 
-## Boas práticas
-- Documentar as fórmulas de cálculo de métricas
-- Garantir granularidade consistente (ex: diário, mensal)
-- Armazenar com particionamento eficiente para leitura
+## Exemplo
+```python
+# Agregação mensal
+df_monthly = df.groupby(['year', 'month', 'cod_maquina']).agg({
+    'quantidade': 'sum',
+    'tempo_parada': 'sum'
+}).reset_index()
+
+df_monthly.to_parquet('kpis_producao_mensal.parquet')
+```

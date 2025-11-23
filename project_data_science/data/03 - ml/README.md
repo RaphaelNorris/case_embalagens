@@ -1,16 +1,25 @@
-# Camada ML (Machine Learning)
+# 🤖 ML Layer
 
-A camada **ML** contém os dados utilizados nos processos de **treinamento, validação e inferência de modelos**.
+## Propósito
+**Features engineeradas** prontas para modelos de ML.
 
-Os datasets aqui já foram enriquecidos com features relevantes e estão no formato apropriado para entrada em pipelines de machine learning.
+## Features Incluídas
+- Temporais (year, month, day_of_week, is_weekend)
+- Agregações (rolling means, stds)
+- Lags (1, 7, 30 days)
+- Derivadas (durações, categorias, flags)
 
-## Possíveis conteúdos
-- Matriz de features (X) e variáveis-alvo (y)
-- Conjuntos de treino/validação/teste
-- Tabelas com versões de engenharia de atributos
-- Pré-processamentos persistidos (escalers, encoders, etc.)
+## Datasets
+- `production_features.parquet`: Features de produção
+- `pedidos_itens_diff.parquet`: Diferenças pedidos vs catálogo
+- `train/test/val splits`: Divisões para ML
 
-## Boas práticas
-- Controlar versionamento das features
-- Salvar metainformações sobre os dados (ex: datas, filtros, parâmetros)
-- Garantir reprodutibilidade de splits
+## Exemplo
+```python
+from src.features.build_features import create_temporal_features, create_production_features
+
+df = pd.read_parquet('../02 - trusted/parquet/tb_tarefcon.parquet')
+df = create_temporal_features(df, 'dt_inicio')
+df = create_production_features(df, group_cols=['cod_maquina'])
+df.to_parquet('production_features.parquet')
+```

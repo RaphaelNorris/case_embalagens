@@ -1,16 +1,28 @@
-# Camada Bronze
+# 🥉 Raw Layer (Bronze)
 
-A camada **Bronze** é responsável por armazenar os dados **brutos** extraídos diretamente das fontes originais (APIs, bancos de dados, arquivos, etc).
+## Propósito
+Dados **brutos sem transformações**, exatamente como extraídos da fonte.
 
-Nenhum tipo de transformação é aplicada neste estágio. O objetivo é garantir **rastreabilidade e reprodutibilidade**, mantendo o dado original exatamente como foi recebido.
+## Características
+- Formato original preservado
+- Sem limpeza ou validação
+- Histórico completo
+- Schema on read
 
-## Exemplos de conteúdo
-- Dumps completos de tabelas
-- Arquivos CSV, JSON ou Parquet originais
-- Respostas brutas de chamadas a APIs
-- Logs ou arquivos de sensores
+## Fontes
+- Oracle Database
+- SQL Server
+- Arquivos CSV/Excel
 
-## Boas práticas
-- Organizar por data de extração (`YYYY/MM/DD`)
-- Evitar sobrescrever arquivos
-- Registrar o processo de ingestão
+## Formato
+- `.parquet` (comprimido)
+- `.csv` (pequenos volumes)
+
+## Exemplo de Uso
+```python
+from src.data.conn_oracle import oracle_connection
+
+with oracle_connection('raw') as conn:
+    df = pd.read_sql("SELECT * FROM tb_clientes", conn)
+    df.to_parquet('01 - raw/tb_clientes.parquet')
+```

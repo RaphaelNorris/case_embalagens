@@ -1,15 +1,29 @@
-# Camada Silver
+# 🥈 Trusted Layer (Silver)
 
-A camada **Silver** contém os dados **tratados e limpos**, prontos para análises exploratórias ou geração de features.
+## Propósito
+Dados **limpos, validados e padronizados**.
 
-Aqui ocorrem padronizações, conversões de tipos, limpeza de dados nulos, joins entre entidades, entre outros.
+## Transformações
+- ✅ Duplicados removidos
+- ✅ Missing values tratados
+- ✅ Tipos de dados corretos
+- ✅ Strings padronizadas
+- ✅ Relações validadas
 
-## Exemplos de transformações
-- Conversão de datas e tipos numéricos
-- Normalização de colunas
-- Remoção de duplicatas
-- Filtragens e joins com tabelas de referência
+## Tabelas Principais
+- `tb_clientes.parquet`: Clientes
+- `tb_pedidos.parquet`: Pedidos
+- `tb_itens.parquet`: Catálogo de produtos
+- `tb_maquinas.parquet`: Máquinas de produção
+- `tb_facas.parquet`: Facas/lâminas
+- `tb_paradas.parquet`: Paradas de máquinas
+- `tb_tarefcon.parquet`: Tarefas de produção
 
-## Boas práticas
-- Documentar claramente as regras de transformação aplicadas
-- Garantir qualidade dos dados com testes unitários simples (ex: colunas obrigatórias não nulas)
+## Exemplo
+```python
+from src.analysis.data_processing import clean_numeric_and_categorical
+
+df_raw = pd.read_parquet('../01 - raw/tb_clientes.parquet')
+df_clean, num_cols, cat_cols = clean_numeric_and_categorical(df_raw)
+df_clean.to_parquet('tb_clientes.parquet')
+```
