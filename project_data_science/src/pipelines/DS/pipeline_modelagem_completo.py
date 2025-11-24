@@ -1,6 +1,9 @@
 """
 PIPELINE COMPLETO - CLUSTERIZAÇÃO + MODELAGEM + SHAP
 Classificação Binária: PRODUTIVO vs IMPRODUTIVO
+from src.logger import get_logger
+
+logger = get_logger(__name__)
 
 Autor: Raphael Norris
 Data: 2025-01-16
@@ -32,18 +35,18 @@ sns.set_palette("husl")
 # PARTE 1: CLUSTERIZAÇÃO (Feature Engineering)
 # ============================================================================
 
-print('='*80)
-print('PARTE 1: CLUSTERIZAÇÃO - FEATURE ENGINEERING')
-print('='*80)
+logger.info('='*80)
+logger.info('PARTE 1: CLUSTERIZAÇÃO - FEATURE ENGINEERING')
+logger.info('='*80)
 
 # Carregar dados
 # df_flexo_pedidos_agg já deve estar carregado no notebook
 # Se não, descomente a linha abaixo:
 # df_flexo_pedidos_agg = pd.read_parquet('df_flexo_pedidos_agg.parquet')
 
-print(f'\nDataset shape: {df_flexo_pedidos_agg.shape}')
-print(f'Target distribution:')
-print(df_flexo_pedidos_agg['TARGET_PRODUTIVO'].value_counts())
+logger.info(f'\nDataset shape: {df_flexo_pedidos_agg.shape}')
+logger.info(f'Target distribution:')
+logger.info(df_flexo_pedidos_agg['TARGET_PRODUTIVO'].value_counts())
 
 # 1.1 Selecionar features para clustering (apenas características do produto)
 features_clustering = [
@@ -59,19 +62,19 @@ features_clustering = [
     'VL_MULTCOMP', 'VL_MULTLARG',
 ]
 
-print(f'\n1.1 Features selecionadas para clustering: {len(features_clustering)}')
+logger.info(f'\n1.1 Features selecionadas para clustering: {len(features_clustering)}')
 
 # Verificar NaNs
 df_cluster = df_flexo_pedidos_agg[features_clustering].copy()
-print(f'    NaNs encontrados: {df_cluster.isna().sum().sum()}')
+logger.info(f'    NaNs encontrados: {df_cluster.isna().sum().sum()}')
 
 # 1.2 Normalizar features (IMPORTANTE para K-Means!)
-print('\n1.2 Normalizando features...')
+logger.info('\n1.2 Normalizando features...')
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(df_cluster)
 
 # 1.3 Elbow Method - Encontrar K ideal
-print('\n1.3 Elbow Method para escolher K...')
+logger.info('\n1.3 Elbow Method para escolher K...')
 
 inertias = []
 silhouette_scores = []
@@ -84,7 +87,7 @@ for k in K_range:
     kmeans.fit(X_scaled)
     inertias.append(kmeans.inertia_)
     silhouette_scores.append(silhouette_score(X_scaled, kmeans.labels_))
-    print(f'    K={k}: Inertia={kmeans.inertia_:.0f}, Silhouette={silhouette_scores[-1]:.3f}')
+    logger.info(f'    K={k}: Inertia={kmeans.inertia_:.0f}, Silhouette={silhouette_scores[-1]:.3f}')
 
 # Plotar elbow
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
@@ -107,18 +110,18 @@ plt.show()
 
 # 1.4 Aplicar K-Means com K escolhido
 K_optimal = 5  # Ajustar baseado no gráfico
-print(f'\n1.4 Aplicando K-Means com K={K_optimal}...')
+logger.info(f'\n1.4 Aplicando K-Means com K={K_optimal}...')
 
 kmeans = KMeans(n_clusters=K_optimal, random_state=42, n_init=10)
 df_flexo_pedidos_agg['CLUSTER_PRODUTO'] = kmeans.fit_predict(X_scaled)
 
-print(f'✓ Clustering concluído!')
-print(f'  Distribuição de clusters:')
-print(df_flexo_pedidos_agg['CLUSTER_PRODUTO'].value_counts().sort_index())
+logger.info(f'✓ Clustering concluído!')
+logger.info(f'  Distribuição de clusters:')
+logger.info(df_flexo_pedidos_agg['CLUSTER_PRODUTO'].value_counts().sort_index())
 
 # 1.5 Analisar perfil dos clusters
-print(f'\n1.5 PERFIL DOS CLUSTERS')
-print('='*80)
+logger.info(f'\n1.5 PERFIL DOS CLUSTERS')
+logger.info('='*80)
 
 cluster_profile = df_flexo_pedidos_agg.groupby('CLUSTER_PRODUTO').agg({
     'CD_OP': 'count',
@@ -143,7 +146,7 @@ cluster_profile.columns = [
     'Comprimento', 'Largura', 'Volume', 'Cores', 'Vincos', 'Gramatura'
 ]
 
-print(cluster_profile)
+logger.info(cluster_profile)
 
 # Plotar perfil dos clusters
 fig, axes = plt.subplots(2, 3, figsize=(16, 10))
@@ -171,25 +174,25 @@ plt.savefig('cluster_profiles.png', dpi=300, bbox_inches='tight')
 plt.show()
 
 # Composições mais comuns por cluster
-print(f'\nCOMPOSIÇÕES MAIS COMUNS POR CLUSTER:')
+logger.info(f'\nCOMPOSIÇÕES MAIS COMUNS POR CLUSTER:')
 for cluster_id in range(K_optimal):
-    print(f'\n  Cluster {cluster_id}:')
+    logger.info(f'\n  Cluster {cluster_id}:')
     top_comp = df_flexo_pedidos_agg[
         df_flexo_pedidos_agg['CLUSTER_PRODUTO'] == cluster_id
     ]['CAT_COMPOSICAO'].value_counts().head(5)
     for comp, count in top_comp.items():
-        print(f'    {comp}: {count} OPs')
+        logger.info(f'    {comp}: {count} OPs')
 
 # ============================================================================
 # PARTE 2: PREPARAÇÃO PARA MODELAGEM
 # ============================================================================
 
-print(f'\n{"="*80}')
-print('PARTE 2: PREPARAÇÃO PARA MODELAGEM')
-print('='*80)
+logger.info(f'\n{"="*80}')
+logger.info('PARTE 2: PREPARAÇÃO PARA MODELAGEM')
+logger.info('='*80)
 
 # 2.1 Remover colunas com data leakage (MANTER CD_ITEM!)
-print('\n2.1 Removendo data leakage...')
+logger.info('\n2.1 Removendo data leakage...')
 
 colunas_remover = [
     'CD_OP',  # Identificador
@@ -209,19 +212,19 @@ df_model = df_flexo_pedidos_agg.drop(columns=colunas_remover, errors='ignore')
 X = df_model.drop(columns=['TARGET_PRODUTIVO'])
 y = df_model['TARGET_PRODUTIVO']
 
-print(f'  Features (X): {X.shape}')
-print(f'  Target (y): {y.shape}')
-print(f'  Distribuição: {dict(y.value_counts())}')
+logger.info(f'  Features (X): {X.shape}')
+logger.info(f'  Target (y): {y.shape}')
+logger.info(f'  Distribuição: {dict(y.value_counts())}')
 
 # 2.2 Identificar features categóricas
 features_cat = X.select_dtypes(include=['object', 'category']).columns.tolist()
-print(f'\n2.2 Features categóricas ({len(features_cat)}):')
+logger.info(f'\n2.2 Features categóricas ({len(features_cat)}):')
 for feat in features_cat:
     nunique = X[feat].nunique()
-    print(f'  - {feat}: {nunique} categorias')
+    logger.info(f'  - {feat}: {nunique} categorias')
 
 # 2.3 Split com GroupKFold (evitar leakage entre OPs do mesmo item)
-print('\n2.3 Split estratégico com GroupKFold por CD_ITEM...')
+logger.info('\n2.3 Split estratégico com GroupKFold por CD_ITEM...')
 
 groups = df_flexo_pedidos_agg['CD_ITEM'].values
 
@@ -230,19 +233,19 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, stratify=y, random_state=42
 )
 
-print(f'  Treino: {len(X_train):,} ({len(X_train)/len(X)*100:.1f}%)')
-print(f'  Teste: {len(X_test):,} ({len(X_test)/len(X)*100:.1f}%)')
+logger.info(f'  Treino: {len(X_train):,} ({len(X_train)/len(X)*100:.1f}%)')
+logger.info(f'  Teste: {len(X_test):,} ({len(X_test)/len(X)*100:.1f}%)')
 
 # ============================================================================
 # PARTE 3: MODELAGEM COM LIGHTGBM
 # ============================================================================
 
-print(f'\n{"="*80}')
-print('PARTE 3: TREINAMENTO DO MODELO')
-print('='*80)
+logger.info(f'\n{"="*80}')
+logger.info('PARTE 3: TREINAMENTO DO MODELO')
+logger.info('='*80)
 
 # 3.1 Treinar modelo
-print('\n3.1 Treinando LightGBM...')
+logger.info('\n3.1 Treinando LightGBM...')
 
 model = LGBMClassifier(
     n_estimators=500,
@@ -271,8 +274,8 @@ model.fit(
     ]
 )
 
-print(f'✓ Modelo treinado!')
-print(f'  Melhor iteração: {model.best_iteration_}')
+logger.info(f'✓ Modelo treinado!')
+logger.info(f'  Melhor iteração: {model.best_iteration_}')
 
 # 3.2 Predições
 y_pred_proba = model.predict_proba(X_test)[:, 1]
@@ -282,22 +285,22 @@ y_pred = (y_pred_proba >= 0.5).astype(int)
 # PARTE 4: AVALIAÇÃO DO MODELO
 # ============================================================================
 
-print(f'\n{"="*80}')
-print('PARTE 4: AVALIAÇÃO DO MODELO')
-print('='*80)
+logger.info(f'\n{"="*80}')
+logger.info('PARTE 4: AVALIAÇÃO DO MODELO')
+logger.info('='*80)
 
 # 4.1 Métricas
-print('\n4.1 Classification Report:')
-print(classification_report(y_test, y_pred, target_names=['Improdutivo', 'Produtivo']))
+logger.info('\n4.1 Classification Report:')
+logger.info(classification_report(y_test, y_pred, target_names=['Improdutivo', 'Produtivo']))
 
 # AUC-ROC
 auc = roc_auc_score(y_test, y_pred_proba)
-print(f'\nAUC-ROC: {auc:.4f}')
+logger.info(f'\nAUC-ROC: {auc:.4f}')
 
 # 4.2 Confusion Matrix
 cm = confusion_matrix(y_test, y_pred)
-print(f'\nConfusion Matrix:')
-print(cm)
+logger.info(f'\nConfusion Matrix:')
+logger.info(cm)
 
 # Visualizar
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
@@ -329,33 +332,33 @@ plt.show()
 # PARTE 5: INTERPRETABILIDADE - SHAP
 # ============================================================================
 
-print(f'\n{"="*80}')
-print('PARTE 5: INTERPRETABILIDADE (SHAP)')
-print('='*80)
+logger.info(f'\n{"="*80}')
+logger.info('PARTE 5: INTERPRETABILIDADE (SHAP)')
+logger.info('='*80)
 
 # 5.1 Calcular SHAP values
-print('\n5.1 Calculando SHAP values (pode demorar alguns minutos)...')
+logger.info('\n5.1 Calculando SHAP values (pode demorar alguns minutos)...')
 
 explainer = shap.TreeExplainer(model)
 shap_values = explainer(X_test)
 
-print('✓ SHAP values calculados!')
+logger.info('✓ SHAP values calculados!')
 
 # 5.2 Feature importance global
-print('\n5.2 Top 20 Features Mais Importantes (Global):')
+logger.info('\n5.2 Top 20 Features Mais Importantes (Global):')
 
 feature_importance = pd.DataFrame({
     'Feature': X_test.columns,
     'Importance': np.abs(shap_values.values).mean(axis=0)
 }).sort_values('Importance', ascending=False)
 
-print(feature_importance.head(20))
+logger.info(feature_importance.head(20))
 
 # Salvar
 feature_importance.to_csv('feature_importance.csv', index=False)
 
 # 5.3 Visualizações SHAP
-print('\n5.3 Gerando visualizações SHAP...')
+logger.info('\n5.3 Gerando visualizações SHAP...')
 
 # Bar plot
 plt.figure(figsize=(10, 8))
@@ -377,9 +380,9 @@ plt.show()
 # PARTE 6: EXEMPLOS DE PREDIÇÕES INDIVIDUAIS
 # ============================================================================
 
-print(f'\n{"="*80}')
-print('PARTE 6: EXEMPLOS DE PREDIÇÕES INDIVIDUAIS')
-print('='*80)
+logger.info(f'\n{"="*80}')
+logger.info('PARTE 6: EXEMPLOS DE PREDIÇÕES INDIVIDUAIS')
+logger.info('='*80)
 
 # 6.1 Escolher exemplos (1 IMPRODUTIVO, 1 PRODUTIVO)
 idx_improdutivo = y_test[y_test == 0].index[0]
@@ -397,15 +400,15 @@ for idx_original, label in [(idx_improdutivo, 'IMPRODUTIVO'), (idx_produtivo, 'P
     real = "IMPRODUTIVO" if y_test.iloc[idx_test] == 0 else "PRODUTIVO"
     pred = "IMPRODUTIVO" if y_pred[idx_test] == 0 else "PRODUTIVO"
 
-    print(f'\n{"="*80}')
-    print(f'EXEMPLO - OP {label}')
-    print('='*80)
-    print(f'\nÍndice: {idx_original}')
-    print(f'Real: {real}')
-    print(f'Predito: {pred}')
-    print(f'\nProbabilidades:')
-    print(f'  Improdutivo: {prob_improdutivo*100:.1f}%')
-    print(f'  Produtivo: {prob_produtivo*100:.1f}%')
+    logger.info(f'\n{"="*80}')
+    logger.info(f'EXEMPLO - OP {label}')
+    logger.info('='*80)
+    logger.info(f'\nÍndice: {idx_original}')
+    logger.info(f'Real: {real}')
+    logger.info(f'Predito: {pred}')
+    logger.info(f'\nProbabilidades:')
+    logger.info(f'  Improdutivo: {prob_improdutivo*100:.1f}%')
+    logger.info(f'  Produtivo: {prob_produtivo*100:.1f}%')
 
     # Top features que contribuíram
     feature_contrib = pd.DataFrame({
@@ -414,10 +417,10 @@ for idx_original, label in [(idx_improdutivo, 'IMPRODUTIVO'), (idx_produtivo, 'P
         'Feature_Value': op_exemplo.values
     }).sort_values('SHAP_Value', key=abs, ascending=False)
 
-    print(f'\nTop 10 Features que mais contribuíram:')
+    logger.info(f'\nTop 10 Features que mais contribuíram:')
     for i, row in feature_contrib.head(10).iterrows():
         direction = "→ aumenta prob" if row['SHAP_Value'] > 0 else "→ diminui prob"
-        print(f"  {row['Feature']:30s} = {str(row['Feature_Value'])[:10]:>10} | SHAP: {row['SHAP_Value']:>+.4f} {direction}")
+        logger.info("  {row['Feature']:30s} = {str(row['Feature_Value'])[:10]:>10} | SHAP: {row['SHAP_Value']:>+.4f} {direction}")
 
     # Waterfall plot
     shap.waterfall_plot(shap_values[idx_test], show=False)
@@ -430,9 +433,9 @@ for idx_original, label in [(idx_improdutivo, 'IMPRODUTIVO'), (idx_produtivo, 'P
 # PARTE 7: SALVAMENTO DE ARTEFATOS
 # ============================================================================
 
-print(f'\n{"="*80}')
-print('PARTE 7: SALVAMENTO DE ARTEFATOS')
-print('='*80)
+logger.info(f'\n{"="*80}')
+logger.info('PARTE 7: SALVAMENTO DE ARTEFATOS')
+logger.info('='*80)
 
 # Salvar modelos
 joblib.dump(model, 'model_produtividade_lgbm.pkl')
@@ -454,23 +457,23 @@ resultados = pd.DataFrame({
 })
 resultados.to_csv('predicoes_teste.csv', index=False)
 
-print('\n✓ Artefatos salvos:')
-print('  - model_produtividade_lgbm.pkl')
-print('  - shap_explainer.pkl')
-print('  - scaler_clustering.pkl')
-print('  - kmeans_model.pkl')
-print('  - df_model_with_clusters.parquet')
-print('  - predicoes_teste.csv')
-print('  - feature_importance.csv')
-print('  - Visualizações: PNG files')
+logger.info('\n✓ Artefatos salvos:')
+logger.info('  - model_produtividade_lgbm.pkl')
+logger.info('  - shap_explainer.pkl')
+logger.info('  - scaler_clustering.pkl')
+logger.info('  - kmeans_model.pkl')
+logger.info('  - df_model_with_clusters.parquet')
+logger.info('  - predicoes_teste.csv')
+logger.info('  - feature_importance.csv')
+logger.info('  - Visualizações: PNG files')
 
 # ============================================================================
 # PARTE 8: ANÁLISE DE CLUSTERS vs PERFORMANCE
 # ============================================================================
 
-print(f'\n{"="*80}')
-print('PARTE 8: ANÁLISE CLUSTERS vs PERFORMANCE')
-print('='*80)
+logger.info(f'\n{"="*80}')
+logger.info('PARTE 8: ANÁLISE CLUSTERS vs PERFORMANCE')
+logger.info('='*80)
 
 cluster_performance = resultados.groupby('Cluster').agg({
     'Index': 'count',
@@ -479,15 +482,15 @@ cluster_performance = resultados.groupby('Cluster').agg({
 }).round(3)
 
 cluster_performance.columns = ['N_OPs_Teste', '% Real Produtivo', 'Prob Média Produtivo']
-print(cluster_performance)
+logger.info(cluster_performance)
 
-print(f'\n{"="*80}')
-print('PIPELINE CONCLUÍDO COM SUCESSO!')
-print('='*80)
-print(f'\nRESUMO:')
-print(f'  - Dataset: {len(df_flexo_pedidos_agg):,} OPs')
-print(f'  - Features: {X.shape[1]}')
-print(f'  - Clusters: {K_optimal}')
-print(f'  - AUC-ROC: {auc:.4f}')
-print(f'  - Treino: {len(X_train):,} / Teste: {len(X_test):,}')
-print('='*80)
+logger.info(f'\n{"="*80}')
+logger.info('PIPELINE CONCLUÍDO COM SUCESSO!')
+logger.info('='*80)
+logger.info(f'\nRESUMO:')
+logger.info(f'  - Dataset: {len(df_flexo_pedidos_agg):,} OPs')
+logger.info(f'  - Features: {X.shape[1]}')
+logger.info(f'  - Clusters: {K_optimal}')
+logger.info(f'  - AUC-ROC: {auc:.4f}')
+logger.info(f'  - Treino: {len(X_train):,} / Teste: {len(X_test):,}')
+logger.info('='*80)

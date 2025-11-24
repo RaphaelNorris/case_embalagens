@@ -1,0 +1,112 @@
+version: '3.8'
+
+services:
+  # ============================================================================
+  # Inference Service - Production predictions
+  # ============================================================================
+  inference:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: adami-inference
+    environment:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=INFO
+      - ORACLE_HOST=${ORACLE_HOST:-localhost}
+      - ORACLE_PORT=${ORACLE_PORT:-1521}
+      - ORACLE_SERVICE_NAME=${ORACLE_SERVICE_NAME:-XEPDB1}
+      - ORACLE_USER=${ORACLE_USER}
+      - ORACLE_PASSWORD=${ORACLE_PASSWORD}
+      - SQLSERVER_HOST=${SQLSERVER_HOST}
+      - SQLSERVER_DATABASE=${SQLSERVER_DATABASE}
+      - SQLSERVER_USER=${SQLSERVER_USER}
+      - SQLSERVER_PASSWORD=${SQLSERVER_PASSWORD}
+    volumes:
+      - ./models:/app/models:ro  # Read-only models
+      - ./logs:/app/logs         # Writable logs
+      - ./data:/app/data:ro      # Read-only data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    # Uncomment to expose API port
+    # ports:
+    #   - "8000:8000"
+    networks:
+      - adami-network
+
+  # ============================================================================
+  # Training Job - Model training (run manually)
+  # ============================================================================
+  training:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: adami-training
+    command: python -m src.pipelines.training.train --machine-type flexo
+    environment:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=INFO
+      - ORACLE_HOST=${ORACLE_HOST}
+      - ORACLE_PORT=${ORACLE_PORT}
+      - ORACLE_SERVICE_NAME=${ORACLE_SERVICE_NAME}
+      - ORACLE_USER=${ORACLE_USER}
+      - ORACLE_PASSWORD=${ORACLE_PASSWORD}
+    volumes:
+      - ./data:/app/data:ro
+      - ./models:/app/models  # Writable for saving models
+      - ./logs:/app/logs
+    profiles:
+      - training  # Only runs when explicitly called
+    networks:
+      - adami-network
+
+  # ============================================================================
+  # Streamlit Dashboard (optional)
+  # ============================================================================
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: adami-dashboard
+    command: streamlit run src/app/streamlit_app.py --server.port=8501 --server.address=0.0.0.0
+    environment:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=INFO
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./models:/app/models:ro
+      - ./data:/app/data:ro
+      - ./logs:/app/logs
+    restart: unless-stopped
+    profiles:
+      - dashboard
+    networks:
+      - adami-network
+
+networks:
+  adami-network:
+    driver: bridge
+
+# ============================================================================
+# Usage:
+# ============================================================================
+# Start inference service:
+#   docker-compose up -d inference
+#
+# Run training job (one-time):
+#   docker-compose --profile training up training
+#
+# Start dashboard:
+#   docker-compose --profile dashboard up -d dashboard
+#
+# View logs:
+#   docker-compose logs -f inference
+#
+# Stop all:
+#   docker-compose down
+# ============================================================================

@@ -1,0 +1,85 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# Notebooks
+notebooks/
+*.ipynb_checkpoints
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Data (large files)
+project_data_science/data/01\ -\ raw/*.parquet
+project_data_science/data/02\ -\ trusted/*.parquet
+project_data_science/data/03\ -\ ml/*.parquet
+project_data_science/data/04\ -\ refined/*.parquet
+
+# Models (will be mounted as volume)
+project_data_science/models/*.pkl
+project_data_science/models/*.joblib
+
+# Logs
+logs/
+*.log
+
+# CI/CD
+.github/
+.pre-commit-config.yaml
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Other
+project_data_engineer/
+lifecycle_ml.png
+thumbnail_image.png

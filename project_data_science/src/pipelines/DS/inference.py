@@ -15,6 +15,9 @@ warnings.filterwarnings(
 )
 
 from . import data_processing
+from src.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def process_pedidos_for_inference(df: pd.DataFrame) -> pd.DataFrame:
@@ -205,7 +208,7 @@ def predict_orders(
         DataFrame with predictions and probabilities
     """
 
-    print(f"🔍 Input DataFrame shape: {orders_df.shape}")
+    logger.info("Input DataFrame shape: {orders_df.shape}")
     training_feature_order: list[str] = []
     task_type = str(model_artifacts.get("task_type", "classification")).lower()
 
@@ -213,14 +216,13 @@ def predict_orders(
     try:
         # Try the inference-specific processing first
         pedidos_proc = process_pedidos_for_inference(orders_df)
-        print(f"✅ Após process_pedidos_for_inference: {pedidos_proc.shape}")
+        logger.info("Após process_pedidos_for_inference: {pedidos_proc.shape}")
 
         # If we still have no data, something is very wrong
         if pedidos_proc.shape[0] == 0:
-            print(
-                "⚠️ Dados vazios após processamento - usando dados originais com processamento mínimo"
+            logger.warning(
+                "Dados vazios após processamento - usando dados originais com processamento mínimo"
             )
-            pedidos_proc = orders_df.copy()
 
             # Ensure we have CD_OP
             if "CD_OP" not in pedidos_proc.columns:
@@ -231,7 +233,7 @@ def predict_orders(
                 )
 
     except Exception as e:
-        print(f"⚠️ Erro no processamento específico, usando dados originais: {str(e)}")
+        logger.info("Erro no processamento específico, usando dados originais: {str(e)}")
         pedidos_proc = orders_df.copy()
 
         # Ensure we have CD_OP
@@ -247,7 +249,7 @@ def predict_orders(
         from . import feature_engineering
 
         pedidos_features = feature_engineering.create_geometric_features(pedidos_proc)
-        print(f"✅ Após feature engineering: {pedidos_features.shape}")
+        logger.info("Após feature engineering: {pedidos_features.shape}")
 
         # If still no data, we have a fundamental problem
         if pedidos_features.shape[0] == 0:
@@ -297,14 +299,13 @@ def predict_orders(
             or model_type.lower() == "catboost"
         )
 
-        print(f"✅ Artefatos carregados:")
-        print(f"   Modelo: {estimator_type} (module: {estimator_module})")
-        print(f"   Model type: {model_type} | Task: {task_type}")
-        print(f"   Is CatBoost: {is_catboost}")
-        print(
+        logger.info("Artefatos carregados:")
+        logger.info("   Modelo: {estimator_type} (module: {estimator_module})")
+        logger.info("   Model type: {model_type} | Task: {task_type}")
+        logger.info("   Is CatBoost: {is_catboost}")
+        logger.info(
             f"   GMM={gmm is not None}, Scaler={scaler is not None}, PCA={pca is not None}"
         )
-        print(f"   Selected features: {len(selected_features)}, Cluster K: {cluster_k}")
 
         if selected_features:
             training_feature_order = selected_features.copy()
@@ -332,13 +333,12 @@ def predict_orders(
                 X_clustering.loc[:, existing_cols] = pedidos_features[existing_cols]
 
             missing_cols = [col for col in feature_cols if col not in existing_cols]
-            print(
-                f"✅ Usando feature_cols do treinamento: {len(feature_cols)} total "
-                f"(presentes: {len(existing_cols)}, preenchidas: {len(missing_cols)})"
+            logger.info(
+                f"Usando feature_cols do treinamento: {len(feature_cols)} total "
             )
 
             if missing_cols:
-                print(f"   ⚠️ Features ausentes preenchidas com 0: {missing_cols[:10]}")
+                logger.info("   Features ausentes preenchidas com 0: {missing_cols[:10]}")
 
             available_cols = feature_cols
         else:
@@ -354,7 +354,7 @@ def predict_orders(
                 col for col in basic_cols if col in pedidos_features.columns
             ]
             X_clustering = pedidos_features[available_cols].copy()
-            print(f"✅ Usando {len(available_cols)} colunas básicas para clustering")
+            logger.info("Usando {len(available_cols)} colunas básicas para clustering")
 
         # Handle missing values
         X_clustering = X_clustering.fillna(X_clustering.median())
@@ -368,7 +368,7 @@ def predict_orders(
                 columns=X_clustering.columns,
                 index=X_clustering.index,
             )
-            print(f"✅ Scaling aplicado")
+            logger.info("Scaling aplicado")
         else:
             X_clustering_scaled = X_clustering
 
@@ -380,7 +380,7 @@ def predict_orders(
             X_clustering_pca.columns = [
                 f"PC{i + 1}" for i in range(X_clustering_pca.shape[1])
             ]
-            print(f"✅ PCA aplicado: {X_clustering_pca.shape[1]} componentes")
+            logger.info("PCA aplicado: {X_clustering_pca.shape[1]} componentes")
         else:
             X_clustering_pca = X_clustering_scaled
 
@@ -394,9 +394,8 @@ def predict_orders(
             X_clustering_pca.values
         )  # Use .values
 
-        print(
-            f"✅ Clustering realizado: {len(set(cluster_predictions))} clusters únicos"
-        )
+        logger.info(
+            f"Clustering realizado: {len(set(cluster_predictions))} clusters únicos"
 
         # Start with original features
         X_with_clusters = pedidos_features.copy()
@@ -408,10 +407,9 @@ def predict_orders(
         for i in range(cluster_k):
             X_with_clusters[f"PROB_CLUSTER_{i}"] = cluster_probabilities[:, i]
 
-        print(
-            f"✅ Features de cluster adicionadas: cluster_pred + {cluster_k} probabilidades"
+        logger.info(
+            f"Features de cluster adicionadas: cluster_pred + {cluster_k} probabilidades"
         )
-
     except Exception as e:
         raise Exception(f"Erro na predição de clusters: {str(e)}")
 
@@ -426,9 +424,8 @@ def predict_orders(
             ]
 
             if missing_training_features:
-                print(
-                    f"⚠️ {len(missing_training_features)} features do treinamento não estavam no pedido. Preenchendo com valores padrão."
-                )
+                logger.info(
+                    f"{len(missing_training_features)} features do treinamento não estavam no pedido. Preenchendo com valores padrão."
                 for feat in missing_training_features:
                     if is_catboost and feat in categorical_features:
                         X_with_clusters[feat] = "UNKNOWN"
@@ -437,10 +434,9 @@ def predict_orders(
 
             model_features = training_feature_order.copy()
             if missing_training_features:
-                print(f"   ⚠️ Features preenchidas: {missing_training_features}")
-            print(
-                f"✅ Usando ordem de features do treinamento: {len(model_features)} colunas"
-            )
+                logger.info("   Features preenchidas: {missing_training_features}")
+            logger.info(
+                f"Usando ordem de features do treinamento: {len(model_features)} colunas"
         else:
             # Fallback to numeric features when we don't know the training subset
             exclude_from_prediction = [
@@ -466,9 +462,8 @@ def predict_orders(
             model_features = [
                 col for col in numeric_cols if col not in exclude_from_prediction
             ]
-            print(
-                f"✅ Usando features numéricas para predição: {len(model_features)}"
-            )
+            logger.info(
+                f"Usando features numéricas para predição: {len(model_features)}"
 
             for col in cluster_prob_cols:
                 if col not in model_features:
@@ -480,12 +475,12 @@ def predict_orders(
                         X_with_clusters[cat_feat] = "UNKNOWN"
                     if cat_feat not in model_features:
                         model_features.append(cat_feat)
-                print(f"✅ Incluindo features categóricas para CatBoost")
+                logger.info("Incluindo features categóricas para CatBoost")
             else:
-                print(f"⚠️ Excluindo features categóricas para {estimator_type}")
+                logger.info("Excluindo features categóricas para {estimator_type}")
 
-        print(f"✅ Features finais para predição: {len(model_features)}")
-        print(f"   Features: {model_features}")
+        logger.info("Features finais para predição: {len(model_features)}")
+        logger.info("   Features: {model_features}")
 
         # Create final feature matrix
         X_model = X_with_clusters[model_features].copy()
@@ -499,14 +494,14 @@ def predict_orders(
                     X_model[col].median()
                 )
 
-        print(f"   Shape final para modelo: {X_model.shape}")
+        logger.info("   Shape final para modelo: {X_model.shape}")
 
         # Debug values for the first sample to help diagnose constant predictions
         if len(X_model) > 0:
             debug_row = X_model.iloc[0]
-            print("🔎 Amostra de valores usados no modelo (primeira linha):")
+            logger.info("Amostra de valores usados no modelo (primeira linha):")
             for feat in model_features[: min(25, len(model_features))]:
-                print(f"   - {feat}: {debug_row[feat]}")
+                logger.info("   - {feat}: {debug_row[feat]}")
 
     except Exception as e:
         raise Exception(f"Erro na preparação das features para predição: {str(e)}")
@@ -522,42 +517,42 @@ def predict_orders(
         results = X_with_clusters.copy()
 
         if task_type == "classification":
-            print("🔍 Executando fluxo de classificação")
+            logger.info("Executando fluxo de classificação")
             if is_catboost:
-                print("   ↳ CatBoost detectado - mantendo DataFrame com features categóricas")
+                logger.info("   ↳ CatBoost detectado - mantendo DataFrame com features categóricas")
                 predictions = estimator.predict(prediction_input)
                 try:
                     probabilities = estimator.predict_proba(prediction_input)
                     if probabilities.shape[1] == 2:
                         prob_produtivo = probabilities[:, 1]
-                        print("✅ Probabilidades obtidas (classificação binária)")
+                        logger.info("Probabilidades obtidas (classificação binária)")
                     else:
                         prob_produtivo = np.max(probabilities, axis=1)
-                        print("✅ Probabilidades obtidas (classificação multi-classe)")
+                        logger.info("Probabilidades obtidas (classificação multi-classe)")
                 except Exception as prob_error:
                     prob_produtivo = predictions.astype(float)
-                    print(f"⚠️ predict_proba não disponível: {str(prob_error)}")
+                    logger.info("predict_proba não disponível: {str(prob_error)}")
             else:
-                print("   ↳ Modelo não-CatBoost - usando apenas colunas numéricas")
+                logger.info("   ↳ Modelo não-CatBoost - usando apenas colunas numéricas")
                 predictions = estimator.predict(prediction_input)
                 try:
                     probabilities = estimator.predict_proba(prediction_input)
                     if probabilities.shape[1] == 2:
                         prob_produtivo = probabilities[:, 1]
-                        print("✅ Probabilidades obtidas (classificação binária)")
+                        logger.info("Probabilidades obtidas (classificação binária)")
                     else:
                         prob_produtivo = np.max(probabilities, axis=1)
-                        print("✅ Probabilidades obtidas (classificação multi-classe)")
+                        logger.info("Probabilidades obtidas (classificação multi-classe)")
                 except Exception as prob_error:
                     prob_produtivo = predictions.astype(float)
-                    print(f"⚠️ predict_proba não disponível: {str(prob_error)}")
+                    logger.info("predict_proba não disponível: {str(prob_error)}")
 
             results["classe_prevista"] = predictions
             results["prob_produtivo"] = prob_produtivo
-            print(f"✅ Predições de classificação realizadas: {predictions}")
+            logger.info("Predições de classificação realizadas: {predictions}")
 
         else:
-            print("🔍 Executando fluxo de regressão (m³/h)")
+            logger.info("Executando fluxo de regressão (m³/h)")
             predictions = estimator.predict(prediction_input).astype(float)
             results["pred_m3_por_hora"] = predictions
 
@@ -616,9 +611,9 @@ def predict_orders(
             tempo_estimado.replace([np.inf, -np.inf], np.nan, inplace=True)
             results["pred_tempo_horas"] = tempo_estimado
 
-            print(f"✅ Predições de regressão realizadas: {predictions}")
+            logger.info("Predições de regressão realizadas: {predictions}")
 
-        print(f"✅ Resultados criados: {results.shape}")
+        logger.info("Resultados criados: {results.shape}")
 
     except Exception as e:
         raise Exception(f"Erro na predição do modelo: {str(e)}")
@@ -641,7 +636,7 @@ def predict_orders(
             top_n = min(8, len(filtered_importance))
             top_features = filtered_importance[:top_n]
             results["top_features"] = [str(top_features)] * len(results)
-            print(f"✅ Feature importance adicionada (do modelo)")
+            logger.info("Feature importance adicionada (do modelo)")
         elif "feature_importance" in model_artifacts:
             if isinstance(model_artifacts["feature_importance"], pd.Series):
                 importance_items = list(model_artifacts["feature_importance"].items())
@@ -650,12 +645,12 @@ def predict_orders(
                     filtered_importance, key=lambda x: abs(x[1]), reverse=True
                 )[:8]
                 results["top_features"] = [str(top_features)] * len(results)
-                print(f"✅ Feature importance adicionada (dos artefatos)")
+                logger.info("Feature importance adicionada (dos artefatos)")
         else:
-            print(f"⚠️ Feature importance não disponível")
+            logger.info("Feature importance não disponível")
 
     except Exception as e:
-        print(f"⚠️ Erro ao adicionar feature importance: {str(e)}")
+        logger.info("Erro ao adicionar feature importance: {str(e)}")
 
     # 9. Return relevant columns
     output_columns = [
@@ -707,7 +702,7 @@ def predict_orders(
     # Filter to existing columns
     final_columns = [col for col in output_columns if col in results.columns]
 
-    print(f"✅ Retornando {len(final_columns)} colunas")
+    logger.info("Retornando {len(final_columns)} colunas")
 
     return results[final_columns]
 
